@@ -9,7 +9,8 @@ class BatchEvaluator:
 
 
 class EpochEvaluator:
-    def __init__(self):
+    def __init__(self, num_cls):
+        self.cls_MCs = [MetricCalculator() for _ in range(num_cls)]
         self.preds, self.labels = [], []
         self.MC = MetricCalculator()
         self.loss = 0
@@ -25,10 +26,19 @@ class EpochEvaluator:
 
     def calculate(self):
         loss = self.loss / len(self.labels)
-        acc = self.MC.cal_acc(self.preds, self.labels)
-        auc = self.MC.cal_auc(self.preds, self.labels)
-        pr = self.MC.cal_PR(self.preds, self.labels)
-        return loss, acc, auc, pr
+        acc, auc, pr = self.MC.calculate_all(self.preds, self.labels)
+        cls_acc, cls_auc, cls_pr = self.calculate_cls()
+        return loss, acc, auc, pr, cls_acc, cls_auc, cls_pr
+
+    def calculate_cls(self):
+        cls_acc, cls_auc, cls_pr = [], [], []
+        for i in range(len(self.cls_MCs)):
+            sampled_idx = torch.nonzero(self.labels == i).view(-1).tolist()
+            sampled_labels, sampled_preds = self.labels[sampled_idx], self.preds[sampled_idx]
+            cls_acc.append(self.cls_MCs[i].cal_acc(sampled_preds, sampled_labels))
+            cls_auc.append(self.cls_MCs[i].cal_auc(sampled_preds, sampled_labels))
+            cls_pr.append(self.cls_MCs[i].cal_PR(sampled_preds, sampled_labels))
+        return cls_acc, cls_auc, cls_pr
 
 
 class MetricCalculator:
@@ -65,5 +75,10 @@ class MetricCalculator:
         except:
             return 0
 
+    def calculate_all(self, preds, labels):
+        acc = self.cal_acc(preds, labels)
+        auc = self.cal_auc(preds, labels)
+        pr = self.cal_PR(preds, labels)
+        return acc, auc, pr
 
 

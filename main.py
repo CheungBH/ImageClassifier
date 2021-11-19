@@ -2,7 +2,7 @@
 import os
 from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
-from eval.evaluate import EpochEvaluator
+from eval.evaluate import EpochEvaluator, MetricCalculator
 import torch.optim as optim
 from torch.optim.lr_scheduler import MultiStepLR, ExponentialLR
 import torch
@@ -74,7 +74,8 @@ os.makedirs(save_dir, exist_ok=True)
 
 for epoch in range(epochs):
     for phase in ["train", "val"]:
-        EV = EpochEvaluator()
+        EpochEval = EpochEvaluator(data_loader.cls_num)
+        BatchEval = MetricCalculator()
         model.train() if phase == "train" else model.eval()
         loss_sum = torch.zeros(1)
 
@@ -98,8 +99,6 @@ for epoch in range(epochs):
                     outputs = model(inputs)
                     loss = criterion(outputs, labels)
 
-                # _, preds = torch.max(outputs, 1)
-
             if phase == 'train':
                 if mix_precision:
                     with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -113,13 +112,16 @@ for epoch in range(epochs):
                             mod.weight.grad.data.add_(sparse * torch.sign(mod.weight.data))
 
                 optimizer.step()
+            EpochEval.update(outputs, labels, loss)
+            acc, auc, pr = BatchEval.calculate_all(outputs, labels)
+            loader_desc.set_description(
+                '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
+                    format(phase=phase, epoch=epoch, loss=loss, acc=acc, AUC=auc, PR=pr)
+            )
 
-            EV.update(outputs, labels, loss)
-
-    loss, acc, auc, pr = EV.calculate()
-    loader_desc.set_description(
-        'Train: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-            format(epoch=epoch, loss=loss, acc=acc, AUC=auc, PR=pr))
+        loss, acc, auc, pr, cls_acc, cls_auc, cls_pr = EpochEval.calculate()
+        print('{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
+                format(phase=phase, epoch=epoch, loss=loss, acc=acc, AUC=auc, PR=pr))
 
     print("Finish training epoch {}".format(epoch))
     torch.save(model.state_dict(), os.path.join(save_dir, "{}.pth".format(epoch)))
