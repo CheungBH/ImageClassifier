@@ -11,7 +11,7 @@ class EpochEvaluator:
         self.loss = 0
 
     def update(self, outputs, labels, loss):
-        self.loss += loss
+        self.loss += loss * len(outputs)
         if len(self.outputs) == 0:
             self.outputs = outputs
             self.labels = labels
