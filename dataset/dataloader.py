@@ -61,7 +61,7 @@ class ClassifyDataset(Dataset):
 
 
 class DataLoader(object):
-    def __init__(self, data_dir, phases, label_path="", batch_size=8, num_worker=2, inp_size=224, adjust_ratio=-1):
+    def __init__(self, data_dir, phases=("train", "val"), label_path="", batch_size=8, num_worker=2, inp_size=224, adjust_ratio=-1):
         if adjust_ratio > 0 and phases is ("train", "val"):
             ImgAdjuster(adjust_ratio, data_dir).run()
 
