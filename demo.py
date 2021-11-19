@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 
-from frame_process import FrameProcessor
+from inference import ModelInference
 import os
 import cv2
 import time
@@ -16,7 +16,7 @@ show_size = (1280, 720)
 
 class Demo:
     def __init__(self, args):
-        self.FP = FrameProcessor()
+        self.MI = ModelInference()
         self.input = args.input_src
         self.output = args.output_src
         self.show = args.show

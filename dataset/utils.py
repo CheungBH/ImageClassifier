@@ -28,6 +28,11 @@ def image_normalize(img_name, size=224):
     return image_tensor
 
 
+def read_labels(label_path):
+    with open(label_path, "r") as f:
+        return f.readlines()
+
+
 def image2tensorboard(img_name, size=224):
     if isinstance(img_name, str):
         image_array = cv2.imread(img_name)

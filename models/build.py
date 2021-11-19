@@ -1,24 +1,35 @@
 from .models import CNNModel
+import torch
+import torch.nn as nn
 
 
 class ModelBuilder:
-    def __init__(self, model_name, cls_name, load_weight="", pretrain=False, device="cuda:0"):
+    def __init__(self, model_name, cls_name, pretrain=False, device="cuda:0"):
         self.model_name = model_name
         self.cls_name = cls_name
-        self.load_weight = load_weight
         self.pretrain = pretrain
         self.device = device
         self.build()
 
     def build(self):
-        self.model = CNNModel(self.cls_name, self.model_name, load_pretrain=self.pretrain)
+        self.CNN = CNNModel(self.cls_name, self.model_name, load_pretrain=self.pretrain)
         if self.device != "cpu":
-            self.model.model.cuda()
-        self.params_to_update = self.model.model.parameters()
-        return self.model.model
+            self.CNN.model.cuda()
+        self.params_to_update = self.CNN.model.parameters()
+        return self.CNN.model
 
     def load_weight(self, path):
-        self.model.load(path)
+        self.CNN.load(path)
+
+    def inference(self, img_tns):
+        img_tensor_list = [torch.unsqueeze(img_tns, 0)]
+        input_tensor = torch.cat(tuple(img_tensor_list), dim=0)
+        self.image_batch_tensor = input_tensor.cuda()
+        outputs = self.CNN.model(self.image_batch_tensor)
+        outputs_tensor = outputs.data
+        m_softmax = nn.Softmax(dim=1)
+        outputs_tensor = m_softmax(outputs_tensor).to("cpu")
+        return outputs_tensor
 
     def freeze(self):
         pass

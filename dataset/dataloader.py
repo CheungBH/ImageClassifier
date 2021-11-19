@@ -1,7 +1,7 @@
 from __future__ import print_function
 import torch
 from torch.utils.data import Dataset
-from .utils import image_normalize
+from .utils import image_normalize, read_labels
 from .adjust_trainval import ImgAdjuster
 import os
 from collections import Counter
@@ -46,17 +46,12 @@ class ClassifyDataset(Dataset):
             _image_object = self.image_processor(image_name, size=self.size)
             return image_name, _image_object, _label
 
-    @staticmethod
-    def read_labels(label_path):
-        with open(label_path, "r") as f:
-            return f.readlines()
-
     def get_labels(self, img_dir, label_path):
         if label_path:
-            return self.read_labels(label_path)
+            return read_labels(label_path)
         label_path = os.path.join(img_dir, "labels.txt")
         if os.path.exists(label_path):
-            return self.read_labels(label_path)
+            return read_labels(label_path)
         else:
             labels = [cls for cls in os.listdir(img_dir) if os.path.isdir(os.path.join(img_dir, cls))]
             with open(label_path, "w") as f:
