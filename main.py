@@ -2,9 +2,11 @@
 import os
 from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
+from eval.evaluate import EpochEvaluator
 import torch.optim as optim
 from torch.optim.lr_scheduler import MultiStepLR, ExponentialLR
 import torch
+from tqdm import tqdm
 import torch.nn as nn
 try:
     from apex import amp
@@ -22,6 +24,7 @@ LR = 0.001
 weightDecay = 0
 momentum = 0
 schedule = "step"
+sparse = 0
 
 model_name = "mobilenet"
 freeze = 0
@@ -37,6 +40,7 @@ data_path = "/home/hkuit155/Desktop/CNN_classification/data/CatDog"
 label_path = ""
 batch_size = 64
 num_worker = 2
+iterations = 0
 
 data_loader = DataLoader(data_path, batch_size=batch_size, num_worker=num_worker, inp_size=inp_size,
                          label_path=label_path)
@@ -70,11 +74,15 @@ os.makedirs(save_dir, exist_ok=True)
 
 for epoch in range(epochs):
     for phase in ["train", "val"]:
+        EV = EpochEvaluator()
         model.train() if phase == "train" else model.eval()
         loss_sum = torch.zeros(1)
 
-        for names, inputs, labels in data_loader.dataloaders_dict[phase]:
+        loader_desc = tqdm(data_loader.dataloaders_dict[phase])
 
+        for i, (names, inputs, labels) in enumerate(loader_desc):
+
+            iterations += 1
             inputs = inputs.to(device)
             labels = labels.to(device)
 
@@ -90,7 +98,7 @@ for epoch in range(epochs):
                     outputs = model(inputs)
                     loss = criterion(outputs, labels)
 
-                _, preds = torch.max(outputs, 1)
+                # _, preds = torch.max(outputs, 1)
 
             if phase == 'train':
                 if mix_precision:
@@ -98,7 +106,20 @@ for epoch in range(epochs):
                         scaled_loss.backward()
                 else:
                     loss.backward()
+
+                if sparse > 0:
+                    for mod in model.modules():
+                        if isinstance(mod, torch.nn.BatchNorm2d):
+                            mod.weight.grad.data.add_(sparse * torch.sign(mod.weight.data))
+
                 optimizer.step()
+
+            EV.update(outputs, labels, loss)
+
+    loss, acc, auc, pr = EV.calculate()
+    loader_desc.set_description(
+        'Train: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
+            format(epoch=epoch, loss=loss, acc=acc, AUC=auc, PR=pr))
 
     print("Finish training epoch {}".format(epoch))
     torch.save(model.state_dict(), os.path.join(save_dir, "{}.pth".format(epoch)))
