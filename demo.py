@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 
-from inference import ModelInference
+from eval.inference import ModelInference
 import os
 import cv2
 import time

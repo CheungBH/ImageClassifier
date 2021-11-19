@@ -36,7 +36,7 @@ model = MB.build()
 MB.load_weight(model_path)
 criterion = nn.CrossEntropyLoss()
 
-phase = "test"
+phase = "val"
 EpochEval = EpochEvaluator(data_loader.cls_num)
 BatchEval = MetricCalculator()
 model.eval()
@@ -61,10 +61,10 @@ for i, (names, inputs, labels) in enumerate(loader_desc):
     EpochEval.update(outputs, labels, loss)
     batch_acc, batch_auc, batch_pr = BatchEval.calculate_all(outputs, labels)
     loader_desc.set_description(
-        '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-            format(phase=phase, epoch=0, loss=loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
+        'Test: loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
+            format(loss=loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
     )
 
 loss, acc, auc, pr, cls_acc, cls_auc, cls_pr = EpochEval.calculate()
-print('{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-        format(phase=phase, epoch=0, loss=loss, acc=acc, AUC=auc, PR=pr))
+print('Test: loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
+        format(loss=loss, acc=acc, AUC=auc, PR=pr))
