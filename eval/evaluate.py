@@ -3,11 +3,6 @@ import torch
 from sklearn import metrics
 
 
-class BatchEvaluator:
-    def __init__(self):
-        pass
-
-
 class EpochEvaluator:
     def __init__(self, num_cls):
         self.cls_MCs = [MetricCalculator() for _ in range(num_cls)]
