@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 from __future__ import print_function
-from src.opt import opt
 device = "cuda:0"
 computer = "laptop"
 
@@ -12,10 +11,6 @@ datasets = {"ceiling": ["freestyle", "frog", "side_freestyle", "side_frog", "but
             "drown_stand": ["drown", "stand_walk"],
             "exercise": ["push_up", "sit_up", "squat_up"]}
 
-if opt.backbone == 'inception':
-    input_size = 299
-else:
-    input_size = 224
 
 freeze_pretrain = {"mobilenet": [155, "classifier"],
                    "shufflenet": [167, "fc"],
@@ -30,12 +25,13 @@ bad_epochs = {30: 0.1}
 patience_decay = {1: 0.5}
 
 # Testing
-test_model_path = "weight/test/finetune/finetune_resnet18_2cls_best.pth"
-test_img_folder = "data/CatDog"
-test_config = "prune/cfg2.txt"
+label_path = "config/labels/cat_dog.txt"
+model_path = "weights/test/1/19.pth"
+model_name = "mobilenet"
+visualize = True
 
 # Evaluation
-eval_model_path = "weight/test/origin/origin_resnet18_2cls_best.pth"
+eval_model_path = "weight/catdog/mobilenet/default_mobilenet_2cls_best.pth"
 eval_img_folder = "data/CatDog"
 eval_config = None
-eval_keyword = "val"
+eval_keyword = "test"
