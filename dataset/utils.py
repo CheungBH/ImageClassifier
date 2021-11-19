@@ -30,7 +30,7 @@ def image_normalize(img_name, size=224):
 
 def read_labels(label_path):
     with open(label_path, "r") as f:
-        return f.readlines()
+        return [item[:-1] for item in f.readlines()]
 
 
 def image2tensorboard(img_name, size=224):

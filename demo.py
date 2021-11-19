@@ -10,9 +10,6 @@ video_ext = ["mp4", "mov", "avi", "mkv", "MP4"]
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 fps = 12
 
-save_size = (1280, 720)
-show_size = (1280, 720)
-
 
 class Demo:
     def __init__(self, args):
@@ -20,8 +17,9 @@ class Demo:
         self.input = args.input_src
         self.output = args.output_src
         self.show = args.show
-        self.save_size = save_size
-        self.show_size = show_size
+        self.show_ratio = args.show_ratio
+        self.save_ratio = args.save_ratio
+
         if os.path.isdir(self.input):
             self.demo_type = "image_folder"
             self.input_imgs = [os.path.join(self.input, file_name) for file_name in os.listdir(self.input)]
@@ -35,7 +33,8 @@ class Demo:
             if self.output:
                 out_ext = self.output.split(".")[-1]
                 assert out_ext in video_ext, "The output should be a video when the input is webcam!"
-                self.out = cv2.VideoWriter(self.output, fourcc, fps, save_size)
+                self.save_size = (int(self.save_ratio * self.cap.get(3)), int(self.save_ratio * self.cap.get(4)))
+                self.out = cv2.VideoWriter(self.output, fourcc, fps, self.save_size)
         else:
             ext = self.input.split(".")[-1]
             if ext in image_ext:
@@ -49,8 +48,9 @@ class Demo:
                 self.cap = cv2.VideoCapture(self.input)
                 if self.output:
                     out_ext = self.output.split(".")[-1]
+                    self.save_size = (int(self.save_ratio * self.cap.get(3)), int(self.save_ratio * self.cap.get(4)))
                     assert out_ext in video_ext, "The output should be a video when the input is a video!"
-                    self.out = cv2.VideoWriter(self.output, fourcc, fps, save_size)
+                    self.out = cv2.VideoWriter(self.output, fourcc, fps, self.save_size)
             else:
                 raise ValueError("Unrecognized src: {}".format(self.input))
 
@@ -64,7 +64,8 @@ class Demo:
                     self.MI.run(frame, cnt=idx)
                     print("Processing time is {}".format(round(time.time() - time_begin), 4))
                     if self.show:
-                        cv2.imshow("result", cv2.resize(frame, self.show_size))
+                        show_size = (int(self.show_ratio * frame.shape[1]), int(self.show_ratio * frame.shape[0]))
+                        cv2.imshow("result", cv2.resize(frame, show_size))
                         cv2.waitKey(1)
                     if self.output:
                         self.out.write(cv2.resize(frame, self.save_size))
@@ -79,20 +80,24 @@ class Demo:
             frame = self.input_img
             self.MI.run(frame)
             if self.show:
-                cv2.imshow("result", cv2.resize(frame, self.show_size))
+                show_size = (int(self.show_ratio * frame.shape[1]), int(self.show_ratio *frame.shape[0]))
+                cv2.imshow("result", cv2.resize(frame, show_size))
                 cv2.waitKey(0)
             if self.output:
-                cv2.imwrite(self.output, cv2.resize(frame, self.save_size))
+                save_size = (int(self.save_ratio * frame.shape[1]), int(self.save_ratio *frame.shape[0]))
+                cv2.imwrite(self.output, cv2.resize(frame, save_size))
             self.MI.release()
         elif self.demo_type == "image_folder":
             for idx, img_name in enumerate(self.input_imgs):
                 frame = cv2.imread(img_name)
                 self.MI.run(frame, cnt=idx)
                 if self.show:
-                    cv2.imshow("result", cv2.resize(frame, self.show_size))
+                    show_size = (int(self.show_ratio * frame.shape[1]), int(self.show_ratio * frame.shape[0]))
+                    cv2.imshow("result", cv2.resize(frame, show_size))
                     cv2.waitKey(1000)
                 if self.output:
-                    cv2.imwrite(self.output_imgs[idx], cv2.resize(frame, self.save_size))
+                    save_size = (int(self.save_ratio * frame.shape[1]), int(self.save_ratio * frame.shape[0]))
+                    cv2.imwrite(self.output_imgs[idx], cv2.resize(frame, save_size))
             self.MI.release()
         else:
             raise ValueError
