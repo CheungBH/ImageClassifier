@@ -1,5 +1,5 @@
 #-*-coding:utf-8-*-
-
+import os
 from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
 import torch.optim as optim
@@ -13,6 +13,7 @@ except ImportError:
     mix_precision = False
 
 device = "cuda:0"
+save_dir = "weights/test/1"
 
 epochs = 20
 
@@ -65,6 +66,7 @@ else:
 if mix_precision:
     m, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 
+os.makedirs(save_dir, exist_ok=True)
 
 for epoch in range(epochs):
     for phase in ["train", "val"]:
@@ -90,8 +92,6 @@ for epoch in range(epochs):
 
                 _, preds = torch.max(outputs, 1)
 
-            print("Current loss is {}".format(loss))
-
             if phase == 'train':
                 if mix_precision:
                     with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -99,3 +99,6 @@ for epoch in range(epochs):
                 else:
                     loss.backward()
                 optimizer.step()
+
+    print("Finish training epoch {}".format(epoch))
+    torch.save(model.state_dict(), os.path.join(save_dir, "{}.pth".format(epoch)))
