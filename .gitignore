@@ -68,5 +68,4 @@ src/tv
 *.pt
 error.txt
 config/config.py
-weights/pretrain/resnext50.pth
-weights/pretrain/resnext101.pth
+weights/*
