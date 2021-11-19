@@ -53,15 +53,6 @@ class DataLoader(object):
         self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), size=inp_size)
                                for x in ['train', 'val']}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
-                                                                shuffle=True, num_workers=2)
+                                                                shuffle=True, num_workers=num_worker)
                             for x in ['train', 'val', ]}
         self.cls_num = len(self.image_datasets["train"].label)
-
-
-# class TestDataLoader:
-#     def __init__(self, data_dir, batch_size, keyword="test", inp_size=224):
-#         self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), config.datasets[opt.dataset], size=inp_size)
-#                                for x in [keyword]}
-#         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
-#                                                                 shuffle=True, num_workers=opt.num_worker)
-#                             for x in [keyword]}
