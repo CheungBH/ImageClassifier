@@ -21,7 +21,7 @@ class ModelInference:
         self.model.eval()
         self.visualize = visualize
 
-    def run(self, img):
+    def run(self, img, cnt=0):
         img_tns = image_normalize(img, size=224)
         self.scores = self.MB.inference(img_tns)
         self.pred_idx = self.scores[0].tolist().index(max(self.scores[0].tolist()))
@@ -30,3 +30,6 @@ class ModelInference:
         if self.visualize:
             cv2.putText(img, self.pred_cls, (50, 50), font, 2, (0, 0, 255), 3)
         return img
+
+    def release(self):
+        return

@@ -61,7 +61,7 @@ class Demo:
                 ret, frame = self.cap.read()
                 if ret:
                     time_begin = time.time()
-                    self.FP.process(frame, cnt=idx)
+                    self.MI.run(frame, cnt=idx)
                     print("Processing time is {}".format(round(time.time() - time_begin), 4))
                     if self.show:
                         cv2.imshow("result", cv2.resize(frame, self.show_size))
@@ -69,7 +69,7 @@ class Demo:
                     if self.output:
                         self.out.write(cv2.resize(frame, self.save_size))
                 else:
-                    self.FP.release()
+                    self.MI.release()
                     self.cap.release()
                     if self.output:
                         self.out.release()
@@ -77,23 +77,23 @@ class Demo:
                 idx += 1
         elif self.demo_type == "image":
             frame = self.input_img
-            self.FP.process(frame)
+            self.MI.run(frame)
             if self.show:
                 cv2.imshow("result", cv2.resize(frame, self.show_size))
                 cv2.waitKey(0)
             if self.output:
                 cv2.imwrite(self.output, cv2.resize(frame, self.save_size))
-            self.FP.release()
+            self.MI.release()
         elif self.demo_type == "image_folder":
             for idx, img_name in enumerate(self.input_imgs):
                 frame = cv2.imread(img_name)
-                self.FP.process(frame, cnt=idx)
+                self.MI.run(frame, cnt=idx)
                 if self.show:
                     cv2.imshow("result", cv2.resize(frame, self.show_size))
                     cv2.waitKey(1000)
                 if self.output:
                     cv2.imwrite(self.output_imgs[idx], cv2.resize(frame, self.save_size))
-            self.FP.release()
+            self.MI.release()
         else:
             raise ValueError
 
