@@ -61,9 +61,10 @@ class ClassifyDataset(Dataset):
 
 
 class DataLoader(object):
-    def __init__(self, data_dir, phases, label_path="", batch_size=8, num_worker=2, inp_size=224):
-        adjust = ImgAdjuster(0.3, data_dir)
-        adjust.run()
+    def __init__(self, data_dir, phases, label_path="", batch_size=8, num_worker=2, inp_size=224, adjust_ratio=-1):
+        if adjust_ratio > 0 and phases is ("train", "val"):
+            ImgAdjuster(adjust_ratio, data_dir).run()
+
         self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), size=inp_size, label_path=label_path)
                                for x in phases}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
