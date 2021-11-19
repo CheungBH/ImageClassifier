@@ -8,11 +8,12 @@ from collections import Counter
 
 
 class ClassifyDataset(Dataset):
-    def __init__(self, img_path, image_processor=image_normalize, size=224):
+    def __init__(self, img_path, image_processor=image_normalize, size=224, label_path=""):
         img_dir_name, img_dir_label, self.img_name, self.img_label = [], [], [], []
         self.size = size
         self.label = []
-        image_label_dict = os.listdir(img_path)
+        image_label_dict = self.get_labels(img_path, label_path)
+        # image_label_dict = os.listdir(img_path)
 
         for idx, cls in enumerate(image_label_dict):
             self.label.append(cls)
@@ -45,14 +46,32 @@ class ClassifyDataset(Dataset):
             _image_object = self.image_processor(image_name, size=self.size)
             return image_name, _image_object, _label
 
+    @staticmethod
+    def read_labels(label_path):
+        with open(label_path, "r") as f:
+            return f.readlines()
+
+    def get_labels(self, img_dir, label_path):
+        if label_path:
+            return self.read_labels(label_path)
+        label_path = os.path.join(img_dir, "labels.txt")
+        if os.path.exists(label_path):
+            return self.read_labels(label_path)
+        else:
+            labels = [cls for cls in os.listdir(img_dir) if os.path.isdir(os.path.join(img_dir, cls))]
+            with open(label_path, "w") as f:
+                for label in labels:
+                    f.write(label + "\n")
+            return labels
+
 
 class DataLoader(object):
-    def __init__(self, data_dir, batch_size=8, num_worker=2, inp_size=224):
+    def __init__(self, data_dir, label_path="", batch_size=8, num_worker=2, inp_size=224):
         adjust = ImgAdjuster(0.3, data_dir)
         adjust.run()
-        self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), size=inp_size)
+        self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), size=inp_size, label_path=label_path)
                                for x in ['train', 'val']}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
                                                                 shuffle=True, num_workers=num_worker)
-                            for x in ['train', 'val', ]}
+                            for x in ['train', 'val']}
         self.cls_num = len(self.image_datasets["train"].label)

@@ -33,10 +33,12 @@ else:
     is_inception = True
 
 data_path = "/home/hkuit155/Desktop/CNN_classification/data/CatDog"
+label_path = ""
 batch_size = 64
 num_worker = 2
 
-data_loader = DataLoader(data_path, batch_size=batch_size, num_worker=num_worker, inp_size=inp_size)
+data_loader = DataLoader(data_path, batch_size=batch_size, num_worker=num_worker, inp_size=inp_size,
+                         label_path=label_path)
 MB = ModelBuilder(model_name, data_loader.cls_num, pretrain=True)
 model = MB.build()
 criterion = nn.CrossEntropyLoss()
