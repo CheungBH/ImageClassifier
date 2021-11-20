@@ -13,7 +13,7 @@ parser.add_argument('--freeze', default=0, type=int)
 parser.add_argument('--batch_size', default=32, type=int)
 parser.add_argument('--epochs', default=20, type=int)
 parser.add_argument('--num_worker', default=1, type=int)
-parser.add_argument('--iteration', default=1, type=int)
+parser.add_argument('--iteration', default=0, type=int)
 parser.add_argument('--sparse', default=0, type=float)
 
 '''optimize configuration'''
@@ -24,7 +24,7 @@ parser.add_argument('--momentum', default=0, type=float)
 parser.add_argument('--schedule', default="step", type=str)
 parser.add_argument('--schedule_gamma', default="")
 
-''''''
+'''other configuration'''
 parser.add_argument('--save_dir', default="weights", type=str)
 parser.add_argument('--device', default="cuda:0")
 args = parser.parse_args()
