@@ -4,6 +4,7 @@ from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
 from trainer.optimizer import OptimizerInitializer
 from trainer.scheduler import SchedulerInitializer
+from trainer.criterion import CriteriaInitializer
 from eval.evaluate import EpochEvaluator, MetricCalculator
 import torch
 from tqdm import tqdm
@@ -42,8 +43,8 @@ def train(args):
                              label_path=label_path)
     MB = ModelBuilder(model_name, data_loader.cls_num, pretrain=True)
     model = MB.build()
-    criterion = nn.CrossEntropyLoss()
 
+    criterion = CriteriaInitializer().get(args)
     optimizer = OptimizerInitializer().get(args, MB.params_to_update)
     scheduler = SchedulerInitializer().get(args, optimizer)
 
