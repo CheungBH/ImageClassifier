@@ -8,7 +8,6 @@ from trainer.criterion import CriteriaInitializer
 from eval.evaluate import EpochEvaluator, MetricCalculator
 import torch
 from tqdm import tqdm
-import torch.nn as nn
 try:
     from apex import amp
     mix_precision = True

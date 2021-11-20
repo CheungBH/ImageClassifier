@@ -27,10 +27,11 @@ parser.add_argument('--schedule', default="step", type=str)
 parser.add_argument('--schedule_gamma', default="")
 
 '''criteria configuration'''
-parser.add_argument('--schedule', default="CE", type=str)
-
+parser.add_argument('--crit', default="CE", type=str)
 
 '''other configuration'''
 parser.add_argument('--save_dir', default="weights", type=str)
 parser.add_argument('--device', default="cuda:0")
+parser.add_argument('--save_interval', default=20, type=int)
+
 args = parser.parse_args()
