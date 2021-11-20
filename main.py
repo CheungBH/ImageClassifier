@@ -36,7 +36,7 @@ else:
     inp_size = 299
     is_inception = True
 
-data_path = "/home/hkuit155/Desktop/CNN_classification/data/CatDog"
+data_path = "/media/hkuit164/Elements/develop_dataset/CatDog"
 label_path = ""
 batch_size = 64
 num_worker = 2

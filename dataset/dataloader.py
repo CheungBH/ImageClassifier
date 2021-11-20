@@ -79,7 +79,7 @@ class DataLoader(object):
         if os.path.exists(label_path):
             return read_labels(label_path)
         else:
-            phase_dir = os.path.join(img_dir, os.listdir(img_dir)[0])
+            phase_dir = os.path.join(img_dir, "train")
             labels = [cls for cls in os.listdir(phase_dir) if os.path.isdir(os.path.join(phase_dir, cls))]
             with open(label_path, "w") as f:
                 for label in labels:
