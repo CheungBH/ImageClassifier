@@ -1,18 +1,24 @@
 from .models import CNNModel
 import torch
 import torch.nn as nn
+import os
+
+
+freeze_pretrain = {"mobilenet": [155, "classifier"],
+                   "shufflenet": [167, "fc"],
+                   "mnasnet": [155, "classifier"],
+                   "resnet18": [59, "fc"],
+                   "squeezenet": [49, "classifier"],
+                   "resnet34": [107, "fc"],
+                   }
 
 
 class ModelBuilder:
-    def __init__(self, model_name, cls_name, pretrain=False, device="cuda:0"):
-        self.model_name = model_name
-        self.cls_name = cls_name
+    def __init__(self, pretrain=False):
         self.pretrain = pretrain
-        self.device = device
-        self.build()
 
     def build(self):
-        self.CNN = CNNModel(self.cls_name, self.model_name, load_pretrain=self.pretrain)
+        self.CNN = CNNModel(self.cls_name, self.backbone, load_pretrain=self.pretrain)
         if self.device != "cpu":
             self.CNN.model.cuda()
         self.params_to_update = self.CNN.model.parameters()
@@ -20,6 +26,18 @@ class ModelBuilder:
 
     def load_weight(self, path):
         self.CNN.load(path)
+    
+    def build_with_args(self, args):
+        self.backbone = args.backbone
+        self.cls_num = args.cls_num
+        self.device = args.device
+        model = self.build()
+        if args.load_model:
+            self.load_weight(args.load_model)
+        if args.freeze:
+            self.freeze(args.freeze)
+        self.write_structure(os.path.join(args.save_dir, "model.txt"), model)
+        return model
 
     def inference(self, img_tns):
         img_tensor_list = [torch.unsqueeze(img_tns, 0)]
@@ -31,24 +49,25 @@ class ModelBuilder:
         outputs_tensor = m_softmax(outputs_tensor).to("cpu")
         return outputs_tensor
 
-    def freeze(self):
-        pass
-        # try:
-        #     feature_layer_num = config.freeze_pretrain[opt.backbone][0]
-        #     classifier_layer_name = config.freeze_pretrain[opt.backbone][1]
-        #     feature_num = int(opt.freeze * feature_layer_num)
-        #
-        #     for idx, (n, p) in enumerate(model.named_parameters()):
-        #         if len(p.shape) == 1 and opt.freeze_bn:
-        #             p.requires_grad = False
-        #         elif classifier_layer_name not in n and idx < feature_num:
-        #             p.requires_grad = False
-        #         else:
-        #             p.requires_grad = True
-        # except:
-        #     raise ValueError("This model is not supported for freezing now")
+    def freeze(self, freeze, freeze_bn=0):
+        try:
+            feature_layer_num = freeze_pretrain[self.backbone][0]
+            classifier_layer_name = freeze_pretrain[self.backbone][1]
+            feature_num = int(freeze * feature_layer_num)
 
+            for idx, (n, p) in enumerate(self.CNN.model.named_parameters()):
+                if len(p.shape) == 1 and freeze_bn:
+                    p.requires_grad = False
+                elif classifier_layer_name not in n and idx < feature_num:
+                    p.requires_grad = False
+                else:
+                    p.requires_grad = True
+        except:
+            raise ValueError("This model is not supported for freezing now")
 
+    @staticmethod
+    def write_structure(file_path, model):
+        print(model, file=open(file_path, "w"))
 
 
 

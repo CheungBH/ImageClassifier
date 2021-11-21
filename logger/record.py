@@ -6,21 +6,26 @@ import os
 
 
 class TrainRecorder:
-    def __init__(self, args, metrics=(), directions=()):
+    def __init__(self, args, metrics=(), directions=(), num_cls=2):
         self.save_dir = args.save_dir
+        self.cls_num = args.cls_num
         os.makedirs(self.save_dir, exist_ok=True)
         self.record_args(args)
         self.directions = directions
         self.metrics = metrics
-        self.initial_best = [0 for _ in range(len(metrics))]
+        assert len(metrics) == len(directions), "The number of metrics and comparision directions is not equal"
+        best_template = [0 for _ in range(len(metrics))]
         for idx, direct in enumerate(self.directions):
             if direct == "down":
-                self.initial_best[idx] = -float("inf")
-        self.epochs, self.bn_mean_ls = [], []
-        assert len(metrics) == len(directions), "The number of metrics and comparision directions is not equal"
+                best_template[idx] = float("inf")
+
         self.metrics_record = {"train": [[] for _ in range(len(metrics))],
                                "val": [[] for _ in range(len(metrics))]}
-        self.best_recorder = {"train": self.initial_best, "val": self.initial_best}
+        self.best_recorder = {"train": best_template, "val": best_template}
+        cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(metrics))]
+        self.cls_metrics_record = {"train": cls_metric_template, "val": cls_metric_template}
+
+        self.epochs, self.bn_mean_ls = [], []
         self.MS = ModelSaver(self.save_dir)
         self.txt_log = txtLogger(self.save_dir, self.metrics)
         self.bn_log = BNLogger(self.save_dir)
@@ -47,10 +52,17 @@ class TrainRecorder:
         updated_metrics = []
         for idx, (metric, m_name, direction, record) \
                 in enumerate(zip(metrics, self.metrics, self.directions, self.metrics_record[phase])):
+            self.metrics_record[phase][idx].append(metric)
             if self.compare(record, metric, direction):
                 updated_metrics.append(m_name)
                 self.best_recorder[idx] = metric
         self.MS.update(model, epoch, updated_metrics)
+
+        for metric_idx in range(len(metrics)):
+            for cls_idx in range(self.cls_num):
+                self.cls_metrics_record[phase][metric_idx][cls_idx].append(
+                    cls_metrics[metric_idx][cls_idx]
+                )
 
     def calculate_BN(self, model):
         bn_sum, bn_num = 0, 0

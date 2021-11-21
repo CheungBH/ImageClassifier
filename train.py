@@ -41,8 +41,12 @@ def train(args):
 
     data_loader = DataLoader(data_path, batch_size=batch_size, num_worker=num_worker, inp_size=inp_size,
                              label_path=label_path)
-    MB = ModelBuilder(model_name, data_loader.cls_num, pretrain=True)
-    model = MB.build()
+    args.cls_num = data_loader.cls_num
+    # MB = ModelBuilder(model_name, data_loader.cls_num, pretrain=True)
+    # model = MB.build()
+
+    MB = ModelBuilder()
+    model = MB.build_with_args(args)
 
     criterion = CriteriaInitializer().get(args)
     optimizer = OptimizerInitializer().get(args, MB.params_to_update)
