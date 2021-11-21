@@ -23,7 +23,7 @@ class EpochEvaluator:
         loss = self.loss / len(self.labels)
         acc, auc, pr = self.MC.calculate_all(self.outputs, self.labels)
         cls_acc, cls_auc, cls_pr = self.calculate_cls()
-        return loss, acc, auc, pr, cls_acc, cls_auc, cls_pr
+        return loss.tolist(), acc, auc, pr, [cls_acc, cls_auc, cls_pr]
 
     def calculate_cls(self):
         cls_acc, cls_auc, cls_pr = [], [], []

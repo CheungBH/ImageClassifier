@@ -47,7 +47,8 @@ def train(args):
 
     criterion = CriteriaInitializer().get(args)
     optimizer = OptimizerInitializer().get(args, MB.params_to_update)
-    scheduler = SchedulerInitializer().get(args, optimizer)
+    schedule = SchedulerInitializer()
+    schedule.get(args, optimizer)
 
     TR = TrainRecorder(args, ["loss", "acc", "auc", "pr"], ["down", "up", "up", "up"])
 
@@ -94,6 +95,8 @@ def train(args):
                                 mod.weight.grad.data.add_(sparse * torch.sign(mod.weight.data))
 
                     optimizer.step()
+                    schedule.update(phase, "iter")
+
                 EpochEval.update(outputs, labels, loss)
                 batch_acc, batch_auc, batch_pr = BatchEval.calculate_all(outputs, labels)
                 loader_desc.set_description(
@@ -101,10 +104,11 @@ def train(args):
                         format(phase=phase, epoch=epoch, loss=loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
                 )
 
-            loss, acc, auc, pr, cls_acc, cls_auc, cls_pr = EpochEval.calculate()
+            schedule.update(phase, "epoch")
+            loss, acc, auc, pr, cls_metric = EpochEval.calculate()
             print('{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
                     format(phase=phase, epoch=epoch, loss=loss, acc=acc, AUC=auc, PR=pr))
-            TR.update(model, (loss, acc, auc, pr), epoch, phase)
+            TR.update(model, (loss, acc, auc, pr), epoch, phase, cls_metric)
 
         print("Finish training epoch {}".format(epoch))
 
