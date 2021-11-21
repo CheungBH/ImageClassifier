@@ -8,7 +8,11 @@ class BaseLogger:
         self.title = ""
 
     def init(self, kw):
-        excel_path = os.path.join("/".join(self.folder.split("/")[:-1]), "{}.csv".format(kw))
+        if not os.path.isdir(self.folder):
+            excel_path = os.path.join("/".join(self.folder.split("/")[:-1]), "{}.csv".format(kw))
+        else:
+            excel_path = os.path.join(self.folder, "{}.csv".format(kw))
+
         if not os.path.exists(excel_path):
             self.file = open(excel_path, "w")
             self.write_title()
