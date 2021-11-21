@@ -18,13 +18,10 @@ except ImportError:
 
 def train(args):
     device = args.device
-    save_dir = args.save_dir
 
     epochs = args.epochs
     sparse = args.sparse
-
     backbone = args.backbone
-    freeze = args.freeze
 
     if backbone != "inception":
         inp_size = 224
