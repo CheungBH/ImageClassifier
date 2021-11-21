@@ -60,7 +60,7 @@ class TrainRecorder:
                 self.best_recorder[idx] = metric
         self.MS.update(model, epoch, updated_metrics)
 
-        for metric_idx in range(len(self.cls_metrics_record)):
+        for metric_idx in range(len(self.cls_metrics)):
             for cls_idx in range(self.cls_num):
                 self.cls_metrics_record[phase][metric_idx][cls_idx].append(
                     cls_metrics[metric_idx][cls_idx]
