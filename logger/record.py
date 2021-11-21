@@ -3,6 +3,7 @@ from .txt_log import txtLogger, BNLogger
 from .logger import CustomizedLogger
 import torch
 import os
+import copy
 
 
 class TrainRecorder:
@@ -23,8 +24,8 @@ class TrainRecorder:
                                "val": [[] for _ in range(len(metrics))]}
         self.best_recorder = {"train": best_template, "val": best_template}
         cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(metrics))]
-        self.cls_metrics_record = {"train": cls_metric_template, "val": cls_metric_template}
-
+        self.cls_metrics_record = {"train": copy.deepcopy(cls_metric_template),
+                                   "val": copy.deepcopy(cls_metric_template)}
         self.epochs, self.bn_mean_ls = [], []
         self.MS = ModelSaver(self.save_dir)
         self.txt_log = txtLogger(self.save_dir, self.metrics)
@@ -72,7 +73,7 @@ class TrainRecorder:
                 bn_sum += torch.sum(abs(mod.weight))
                 # self.tb_writer.add_histogram("bn_weight", mod.weight.data.cpu().numpy(), self.curr_epoch)
         bn_ave = bn_sum / bn_num
-        return bn_ave
+        return bn_ave.tolist()
 
     @staticmethod
     def compare(before, after, direction):
