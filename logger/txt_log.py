@@ -4,21 +4,22 @@ import os
 class txtLogger:
     def __init__(self, folder, metrics):
         self.folder = folder
-        self.file = open(os.path.join(folder, "log.txt"), "w")
         self.metrics = metrics
 
     def update(self, epoch, phase, metrics):
-        out = "{}: {} | ".format(phase, epoch)
-        for metric, name in zip(metrics, self.metrics):
-            out += "{}: {} | ".format(name, metric)
-        self.file.write(out + "\n")
-        if phase == "val":
-            self.file.write("---------------------------------------------\n")
+        with open(os.path.join(self.folder, "log.txt"), "a+") as f:
+            out = "{}: {} | ".format(phase, epoch)
+            for metric, name in zip(metrics, self.metrics):
+                out += "{}: {} | ".format(name, metric)
+            f.write(out + "\n")
+            if phase == "val":
+                f.write("---------------------------------------------\n")
 
 
 class BNLogger:
     def __init__(self, folder):
-        self.file = open(os.path.join(folder, "bn.txt"), "w")
+        self.file = os.path.join(folder, "bn.txt")
 
     def update(self, epoch, bn_ave):
-        self.file.write("{} -> {}\n".format(epoch, bn_ave))
+        with open(self.file, "a+") as f:
+            f.write("{} -> {}\n".format(epoch, bn_ave))
