@@ -1,11 +1,12 @@
 #-*-coding:utf-8-*-
-import os
 from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
 from trainer.optimizer import OptimizerInitializer
 from trainer.scheduler import SchedulerInitializer
 from trainer.criterion import CriteriaInitializer
 from eval.evaluate import EpochEvaluator, MetricCalculator
+from logger.record import TrainRecorder
+
 import torch
 from tqdm import tqdm
 try:
@@ -47,10 +48,10 @@ def train(args):
     optimizer = OptimizerInitializer().get(args, MB.params_to_update)
     scheduler = SchedulerInitializer().get(args, optimizer)
 
+    TR = TrainRecorder(args, ["loss", "acc", "auc", "pr"], ["down", "up", "up", "up"])
+
     if mix_precision:
         m, optimizer = amp.initialize(model, optimizer, opt_level="O1")
-
-    os.makedirs(save_dir, exist_ok=True)
 
     for epoch in range(epochs):
         for phase in ["train", "val"]:
@@ -101,11 +102,11 @@ def train(args):
             loss, acc, auc, pr, cls_acc, cls_auc, cls_pr = EpochEval.calculate()
             print('{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
                     format(phase=phase, epoch=epoch, loss=loss, acc=acc, AUC=auc, PR=pr))
+            TR.update(model, (loss, acc, auc, pr), epoch, phase)
 
         print("Finish training epoch {}".format(epoch))
-        torch.save(model.state_dict(), os.path.join(save_dir, "{}.pth".format(epoch)))
 
 
 if __name__ == '__main__':
-    from train_args import args
+    from config.train_args import args
     train(args)

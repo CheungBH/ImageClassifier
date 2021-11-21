@@ -14,3 +14,11 @@ class txtLogger:
         self.file.write(out + "\n")
         if phase == "val":
             self.file.write("---------------------------------------------\n")
+
+
+class BNLogger:
+    def __init__(self, folder):
+        self.file = open(os.path.join(folder, "bn.txt"), "w")
+
+    def update(self, epoch, bn_ave):
+        self.file.write("{} -> {}\n".format(epoch, bn_ave))
