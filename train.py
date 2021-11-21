@@ -78,6 +78,7 @@ def train(args):
                         loss = loss1 + 0.4 * loss2
                     else:
                         outputs = model(inputs)
+                        outputs = MB.softmax(outputs)
                         loss = criterion(outputs, labels)
 
                 if phase == 'train':

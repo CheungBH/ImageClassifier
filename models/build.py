@@ -23,6 +23,7 @@ class ModelBuilder:
         if self.device != "cpu":
             self.CNN.model.cuda()
         self.params_to_update = self.CNN.model.parameters()
+        self.softmax = torch.nn.Softmax(dim=1)
         return self.CNN.model
 
     def load_weight(self, path):
