@@ -67,7 +67,7 @@ def test(args):
                 format(loss=loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
         )
 
-    loss, acc, auc, pr, cls_acc, cls_auc, cls_pr = EpochEval.calculate()
+    loss, acc, auc, pr, cls_metrics = EpochEval.calculate()
     print('Test: loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
             format(loss=loss, acc=acc, AUC=auc, PR=pr))
 
