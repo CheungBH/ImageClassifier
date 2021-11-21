@@ -88,6 +88,9 @@ class DataLoader:
         if adjust_ratio > 0 and self.phases is ("train", "val"):
             ImgAdjuster(adjust_ratio, data_dir).run()
         assert self.phases, "Please assign your phases using the dataset!"
+        self.build(data_dir, label_path, inp_size, batch_size, num_worker)
+
+    def build(self, data_dir, label_path="", inp_size=224, batch_size=32, num_worker=2):
         self.label = self.get_labels(data_dir, label_path)
         self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), self.label, size=inp_size) for x in self.phases}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,

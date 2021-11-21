@@ -20,6 +20,8 @@ def test(args):
     model_path = args.model_path
     data_path = args.data_path
     label_path = args.label_path
+    batch_size = args.batch_size
+    num_worker = args.num_worker
     phase = args.phase
     backbone = args.backbone if args.backbone else get_pretrain(model_path)
 
@@ -30,11 +32,9 @@ def test(args):
         inp_size = 299
         is_inception = True
 
-    batch_size = args.batch_size
-    num_worker = args.num_worker
+    data_loader = DataLoader(phases=(phase,))
+    data_loader.build(data_path, label_path, inp_size, batch_size, num_worker)
 
-    data_loader = DataLoader(data_path, batch_size=batch_size, num_worker=num_worker, inp_size=inp_size, phases=(phase, ),
-                             label_path=label_path)
     MB = ModelBuilder()
     model = MB.build(data_loader.cls_num, backbone)
     MB.load_weight(model_path)
