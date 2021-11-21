@@ -10,7 +10,7 @@ class txtLogger:
     def update(self, epoch, phase, metrics):
         out = "{}: {} | ".format(phase, epoch)
         for metric, name in zip(metrics, self.metrics):
-            out += "{}: {}".format(name, metric)
+            out += "{}: {} | ".format(name, metric)
         self.file.write(out + "\n")
         if phase == "val":
             self.file.write("---------------------------------------------\n")

@@ -45,10 +45,12 @@ class TrainRecorder:
 
     def update(self, model, metrics, epoch, phase, cls_metrics=()):
         self.epochs.append(epoch)
-        bn_ave = self.calculate_BN(model)
-        self.bn_mean_ls.append(bn_ave)
         self.txt_log.update(epoch, phase, metrics)
-        self.bn_log.update(epoch, bn_ave)
+
+        if phase == "train":
+            bn_ave = self.calculate_BN(model)
+            self.bn_mean_ls.append(bn_ave)
+            self.bn_log.update(epoch, bn_ave)
 
         epoch = -1 if epoch % self.save_interval != 0 else epoch
         updated_metrics = []
