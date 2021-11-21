@@ -51,7 +51,7 @@ class TrainRecorder:
         epoch = -1 if epoch % self.save_interval != 0 else epoch
         updated_metrics = []
         for idx, (metric, m_name, direction, record) \
-                in enumerate(zip(metrics, self.metrics, self.directions, self.metrics_record[phase])):
+                in enumerate(zip(metrics, self.metrics, self.directions, self.best_recorder[phase])):
             self.metrics_record[phase][idx].append(metric)
             if self.compare(record, metric, direction):
                 updated_metrics.append(m_name)
