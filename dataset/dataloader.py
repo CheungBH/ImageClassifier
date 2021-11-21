@@ -46,21 +46,8 @@ class ClassifyDataset(Dataset):
             _image_object = self.image_processor(image_name, size=self.size)
             return image_name, _image_object, _label
 
-    # def get_labels(self, img_dir, label_path):
-    #     if label_path:
-    #         return read_labels(label_path)
-    #     label_path = os.path.join(img_dir, "labels.txt")
-    #     if os.path.exists(label_path):
-    #         return read_labels(label_path)
-    #     else:
-    #         labels = [cls for cls in os.listdir(img_dir) if os.path.isdir(os.path.join(img_dir, cls))]
-    #         with open(label_path, "w") as f:
-    #             for label in labels:
-    #                 f.write(label + "\n")
-    #         return labels
 
-
-class DataLoader(object):
+class DataLoader_old(object):
     def __init__(self, data_dir, phases=("train", "val"), label_path="", batch_size=8, num_worker=2, inp_size=224, adjust_ratio=-1):
         if adjust_ratio > 0 and phases is ("train", "val"):
             ImgAdjuster(adjust_ratio, data_dir).run()
@@ -71,6 +58,42 @@ class DataLoader(object):
                                                                 shuffle=True, num_workers=num_worker)
                             for x in phases}
         self.cls_num = len(self.image_datasets[phases[0]].label)
+
+    def get_labels(self, img_dir, label_path):
+        if label_path:
+            return read_labels(label_path)
+        label_path = os.path.join(img_dir, "labels.txt")
+        if os.path.exists(label_path):
+            return read_labels(label_path)
+        else:
+            phase_dir = os.path.join(img_dir, "train")
+            labels = [cls for cls in os.listdir(phase_dir) if os.path.isdir(os.path.join(phase_dir, cls))]
+            with open(label_path, "w") as f:
+                for label in labels:
+                    f.write(label + "\n")
+            return labels
+
+
+class DataLoader:
+    def __init__(self,  phases=("train", "val")):
+        self.phases = phases
+
+    def build_with_args(self, args, inp_size=224):
+        adjust_ratio = args.trainval_ratio
+        data_dir = args.data_path
+        label_path = args.label_path
+        batch_size = args.batch_size
+        num_worker = args.num_worker
+
+        if adjust_ratio > 0 and self.phases is ("train", "val"):
+            ImgAdjuster(adjust_ratio, data_dir).run()
+        assert self.phases, "Please assign your phases using the dataset!"
+        self.label = self.get_labels(data_dir, label_path)
+        self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), self.label, size=inp_size) for x in self.phases}
+        self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
+                                                                shuffle=True, num_workers=num_worker)
+                            for x in self.phases}
+        self.cls_num = len(self.image_datasets[self.phases[0]].label)
 
     def get_labels(self, img_dir, label_path):
         if label_path:

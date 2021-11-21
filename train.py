@@ -30,17 +30,11 @@ def train(args):
         inp_size = 299
         is_inception = True
 
-    data_path = args.data_path
-    label_path = args.label_path
-    batch_size = args.batch_size
-    num_worker = args.num_worker
     iterations = args.iteration
 
-    data_loader = DataLoader(data_path, batch_size=batch_size, num_worker=num_worker, inp_size=inp_size,
-                             label_path=label_path)
+    data_loader = DataLoader()
+    data_loader.build_with_args(args, inp_size)
     args.cls_num = data_loader.cls_num
-    # MB = ModelBuilder(backbone, data_loader.cls_num, pretrain=True)
-    # model = MB.build()
 
     MB = ModelBuilder()
     model = MB.build_with_args(args)
@@ -50,7 +44,7 @@ def train(args):
     schedule = SchedulerInitializer()
     schedule.get(args, optimizer)
 
-    TR = TrainRecorder(args, ["loss", "acc", "auc", "pr"], ["down", "up", "up", "up"])
+    TR = TrainRecorder(args, ["loss", "acc", "auc", "pr"], ["down", "up", "up", "up"], ["acc", "auc", "pr"])
 
     if mix_precision:
         m, optimizer = amp.initialize(model, optimizer, opt_level="O1")

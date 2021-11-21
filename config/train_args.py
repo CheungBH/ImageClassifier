@@ -15,6 +15,7 @@ parser.add_argument('--epochs', default=20, type=int)
 parser.add_argument('--num_worker', default=1, type=int)
 parser.add_argument('--iteration', default=0, type=int)
 parser.add_argument('--sparse', default=0, type=float)
+parser.add_argument('--trainval_ratio', default=-1, type=float)
 parser.add_argument('--load_weight', default="", type=str)
 parser.add_argument('--resume', action="store_true")
 

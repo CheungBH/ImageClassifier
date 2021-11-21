@@ -7,9 +7,10 @@ import copy
 
 
 class TrainRecorder:
-    def __init__(self, args, metrics=(), directions=(), num_cls=2):
+    def __init__(self, args, metrics=(), directions=(), cls_metrics=()):
         self.save_dir = args.save_dir
         self.cls_num = args.cls_num
+        self.cls_metrics = cls_metrics
         os.makedirs(self.save_dir, exist_ok=True)
         self.record_args(args)
         self.directions = directions
@@ -23,7 +24,7 @@ class TrainRecorder:
         self.metrics_record = {"train": [[] for _ in range(len(metrics))],
                                "val": [[] for _ in range(len(metrics))]}
         self.best_recorder = {"train": best_template, "val": best_template}
-        cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(metrics))]
+        cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
         self.cls_metrics_record = {"train": copy.deepcopy(cls_metric_template),
                                    "val": copy.deepcopy(cls_metric_template)}
         self.epochs, self.bn_mean_ls = [], []
