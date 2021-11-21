@@ -8,17 +8,17 @@ import torch
 
 label_path = config.label_path
 model_path = config.model_path
-model_name = config.model_name
+backbone = config.backbone
 visualize = config.visualize
 
 
 class ModelInference:
     def __init__(self):
-        self.model_name = model_name if model_name else get_pretrain(model_path)
+        self.backbone = backbone if backbone else get_pretrain(model_path)
         self.model_size = 224
         self.classes = read_labels(label_path)
-        self.MB = ModelBuilder(self.model_name, len(self.classes))
-        self.model = self.MB.build()
+        self.MB = ModelBuilder()
+        self.model = self.MB.build(len(self.classes), self.backbone)
         self.MB.load_weight(model_path)
         self.model.eval()
         self.visualize = visualize

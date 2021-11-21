@@ -14,11 +14,12 @@ freeze_pretrain = {"mobilenet": [155, "classifier"],
 
 
 class ModelBuilder:
-    def __init__(self, pretrain=False):
+    def __init__(self, pretrain=False, device="cuda:0"):
         self.pretrain = pretrain
+        self.device = device
 
-    def build(self):
-        self.CNN = CNNModel(self.cls_num, self.backbone, load_pretrain=self.pretrain)
+    def build(self, cls_num, backbone):
+        self.CNN = CNNModel(cls_num, backbone, load_pretrain=self.pretrain)
         if self.device != "cpu":
             self.CNN.model.cuda()
         self.params_to_update = self.CNN.model.parameters()
@@ -31,7 +32,7 @@ class ModelBuilder:
         self.backbone = args.backbone
         self.cls_num = args.cls_num
         self.device = args.device
-        model = self.build()
+        model = self.build(self.cls_num, self.backbone)
         if args.load_weight:
             self.load_weight(args.load_model)
         if args.freeze:

@@ -21,9 +21,9 @@ def test(args):
     data_path = args.data_path
     label_path = args.label_path
     phase = args.phase
-    model_name = args.model_name if args.model_name else get_pretrain(model_path)
+    backbone = args.backbone if args.backbone else get_pretrain(model_path)
 
-    if model_name != "inception":
+    if backbone != "inception":
         inp_size = 224
         is_inception = False
     else:
@@ -35,8 +35,8 @@ def test(args):
 
     data_loader = DataLoader(data_path, batch_size=batch_size, num_worker=num_worker, inp_size=inp_size, phases=(phase, ),
                              label_path=label_path)
-    MB = ModelBuilder(model_name, data_loader.cls_num)
-    model = MB.build()
+    MB = ModelBuilder()
+    model = MB.build(data_loader.cls_num, backbone)
     MB.load_weight(model_path)
     criterion = nn.CrossEntropyLoss()
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--data_path', required=True)
     parser.add_argument('--label_path', default="")
-    parser.add_argument('--model_name', default="")
+    parser.add_argument('--backbone', default="")
     parser.add_argument('--phase', default="val")
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--num_worker', default=1, type=int)

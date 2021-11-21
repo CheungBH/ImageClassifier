@@ -27,7 +27,7 @@ patience_decay = {1: 0.5}
 # Testing
 label_path = "config/labels/cat_dog.txt"
 model_path = "weights/test/1/19.pth"
-model_name = "mobilenet"
+backbone = "mobilenet"
 visualize = True
 
 # Evaluation
