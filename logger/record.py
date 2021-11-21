@@ -1,6 +1,7 @@
 from .model_storage import ModelSaver
 from .txt_log import txtLogger, BNLogger
 from .logger import CustomizedLogger
+from .tb_manager import TensorboardManager
 import torch
 import os
 import copy
@@ -31,6 +32,7 @@ class TrainRecorder:
         self.MS = ModelSaver(self.save_dir)
         self.txt_log = txtLogger(self.save_dir, self.metrics)
         self.bn_log = BNLogger(self.save_dir)
+        self.tb_manager = TensorboardManager(self.save_dir, self.metrics)
 
     def record_args(self, args):
         self.model_idx = self.save_dir.split("/")[-1]
@@ -46,6 +48,7 @@ class TrainRecorder:
     def update(self, model, metrics, epoch, phase, cls_metrics=()):
         self.epochs.append(epoch)
         self.txt_log.update(epoch, phase, metrics)
+        self.tb_manager.update(metrics, phase, epoch, model)
 
         if phase == "train":
             bn_ave = self.calculate_BN(model)
