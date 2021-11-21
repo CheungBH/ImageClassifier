@@ -18,7 +18,7 @@ class ModelBuilder:
         self.pretrain = pretrain
 
     def build(self):
-        self.CNN = CNNModel(self.cls_name, self.backbone, load_pretrain=self.pretrain)
+        self.CNN = CNNModel(self.cls_num, self.backbone, load_pretrain=self.pretrain)
         if self.device != "cpu":
             self.CNN.model.cuda()
         self.params_to_update = self.CNN.model.parameters()
@@ -32,7 +32,7 @@ class ModelBuilder:
         self.cls_num = args.cls_num
         self.device = args.device
         model = self.build()
-        if args.load_model:
+        if args.load_weight:
             self.load_weight(args.load_model)
         if args.freeze:
             self.freeze(args.freeze)

@@ -6,7 +6,7 @@ parser.add_argument('--data_path', required=True)
 parser.add_argument('--label_path', default="")
 
 '''model configuration'''
-parser.add_argument('--model_name', default="mobilenet", type=str)
+parser.add_argument('--backbone', default="mobilenet", type=str)
 parser.add_argument('--freeze', default=0, type=int)
 
 '''train configuration'''

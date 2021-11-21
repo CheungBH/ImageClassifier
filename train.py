@@ -23,10 +23,10 @@ def train(args):
     epochs = args.epochs
     sparse = args.sparse
 
-    model_name = args.model_name
+    backbone = args.backbone
     freeze = args.freeze
 
-    if model_name != "inception":
+    if backbone != "inception":
         inp_size = 224
         is_inception = False
     else:
@@ -42,7 +42,7 @@ def train(args):
     data_loader = DataLoader(data_path, batch_size=batch_size, num_worker=num_worker, inp_size=inp_size,
                              label_path=label_path)
     args.cls_num = data_loader.cls_num
-    # MB = ModelBuilder(model_name, data_loader.cls_num, pretrain=True)
+    # MB = ModelBuilder(backbone, data_loader.cls_num, pretrain=True)
     # model = MB.build()
 
     MB = ModelBuilder()
