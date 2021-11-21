@@ -38,6 +38,7 @@ class ModelBuilder:
             self.load_weight(args.load_model)
         if args.freeze:
             self.freeze(args.freeze)
+        os.makedirs(args.save_dir, exist_ok=True)
         self.write_structure(os.path.join(args.save_dir, "model.txt"), model)
         return model
 
