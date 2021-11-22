@@ -102,6 +102,7 @@ def train(args):
             schedule.update(phase, "epoch")
             loss, acc, auc, pr, cls_metric = EpochEval.calculate()
             TR.update(model, (loss, acc, auc, pr), epoch, phase, cls_metric)
+    TR.release()
 
 
 if __name__ == '__main__':

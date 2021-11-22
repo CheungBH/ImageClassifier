@@ -63,3 +63,6 @@ class TrainRecorder:
             self.bn_log.update(epoch, bn_ave)
         elif phase == "val":
             self.logs.update(self.epochs_ls[-1], self.metrics_record, self.cls_metrics_record)
+
+    def release(self):
+        self.logs.release(self.best_recorder)
