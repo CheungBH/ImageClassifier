@@ -63,7 +63,7 @@ class LoggerManager:
         for phase in ["train", "val"]:
             for idx in range(len(self.metrics)):
                 summary_log_value.append(best_recorder[phase][idx])
-        self.summary_logger.write_summarize(summary_log_value)
+        self.summary_logger.write(summary_log_value)
 
     def update(self, epoch, metrics, cls_metrics):
         individual_log_value = [epoch]
@@ -76,4 +76,4 @@ class LoggerManager:
                 for j in range(len(self.labels)):
                     individual_log_value.append(cls_metrics[phase][i][j][-1])
                 individual_log_value.append("")
-        self.individual_logger.write_summarize(individual_log_value)
+        self.individual_logger.write(individual_log_value)

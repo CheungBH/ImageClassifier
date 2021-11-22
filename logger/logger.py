@@ -38,6 +38,9 @@ class BaseLogger:
             self.file.write("{}\n".format(self.list2str(item)))
         self.file.write("\n")
 
+    def write(self, ls):
+        self.file.write("{}\n".format(self.list2str(ls)))
+
 
 class CustomizedLogger(BaseLogger):
     def __init__(self, folder, title, excel_name):
