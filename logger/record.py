@@ -2,7 +2,7 @@ from .model_storage import ModelSaver
 from .txt_log import txtLogger, BNLogger
 from .tb_manager import TensorboardManager
 from .log_manager import LoggerManager
-import torch
+from .utils import *
 import os
 import copy
 
@@ -46,7 +46,7 @@ class TrainRecorder:
         for idx, (metric, m_name, direction, record) \
                 in enumerate(zip(metrics, self.metrics, self.directions, self.best_recorder[phase])):
             self.metrics_record[phase][idx].append(metric)
-            if self.compare(record, metric, direction):
+            if compare(record, metric, direction):
                 updated_metrics.append(m_name)
                 self.best_recorder[idx] = metric
         self.MS.update(model, epoch, updated_metrics)
@@ -58,27 +58,8 @@ class TrainRecorder:
                 )
 
         if phase == "train":
-            bn_ave = self.calculate_BN(model)
+            bn_ave = calculate_BN(model)
             self.bn_mean_ls.append(bn_ave)
             self.bn_log.update(epoch, bn_ave)
         elif phase == "val":
             self.logs.update(self.epochs_ls[-1], self.metrics_record, self.cls_metrics_record)
-
-    def calculate_BN(self, model):
-        bn_sum, bn_num = 0, 0
-        for mod in model.modules():
-            if isinstance(mod, torch.nn.BatchNorm2d):
-                bn_num += mod.num_features
-                bn_sum += torch.sum(abs(mod.weight))
-                # self.tb_writer.add_histogram("bn_weight", mod.weight.data.cpu().numpy(), self.curr_epoch)
-        bn_ave = bn_sum / bn_num
-        return bn_ave.tolist()
-
-    @staticmethod
-    def compare(before, after, direction):
-        if direction == "up":
-            return True if after > before else False
-        elif direction == "down":
-            return True if after < before else False
-        else:
-            raise ValueError("Please assign the direction correctly")
