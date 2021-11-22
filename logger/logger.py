@@ -41,7 +41,7 @@ class BaseLogger:
 
 class CustomizedLogger(BaseLogger):
     def __init__(self, folder, title, excel_name):
-        super(BaseLogger, self).__init__(folder)
+        super().__init__(folder)
         self.title = title
         self.init(excel_name)
 

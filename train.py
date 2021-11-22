@@ -35,6 +35,7 @@ def train(args):
     data_loader = DataLoader()
     data_loader.build_with_args(args, inp_size)
     args.cls_num = data_loader.cls_num
+    args.labels = data_loader.label
 
     MB = ModelBuilder()
     model = MB.build_with_args(args)
@@ -100,11 +101,7 @@ def train(args):
 
             schedule.update(phase, "epoch")
             loss, acc, auc, pr, cls_metric = EpochEval.calculate()
-            print('{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-                    format(phase=phase, epoch=epoch, loss=loss, acc=acc, AUC=auc, PR=pr))
             TR.update(model, (loss, acc, auc, pr), epoch, phase, cls_metric)
-
-        print("Finish training epoch {}".format(epoch))
 
 
 if __name__ == '__main__':

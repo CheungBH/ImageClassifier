@@ -1,7 +1,7 @@
 from .model_storage import ModelSaver
 from .txt_log import txtLogger, BNLogger
-from .logger import CustomizedLogger
 from .tb_manager import TensorboardManager
+from .log_manager import LoggerManager
 import torch
 import os
 import copy
@@ -10,10 +10,11 @@ import copy
 class TrainRecorder:
     def __init__(self, args, metrics=(), directions=(), cls_metrics=()):
         self.save_dir = args.save_dir
+        self.save_interval = args.save_interval
+
         self.cls_num = args.cls_num
         self.cls_metrics = cls_metrics
         os.makedirs(self.save_dir, exist_ok=True)
-        self.record_args(args)
         self.directions = directions
         self.metrics = metrics
         assert len(metrics) == len(directions), "The number of metrics and comparision directions is not equal"
@@ -28,32 +29,17 @@ class TrainRecorder:
         cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
         self.cls_metrics_record = {"train": copy.deepcopy(cls_metric_template),
                                    "val": copy.deepcopy(cls_metric_template)}
-        self.epochs, self.bn_mean_ls = [], []
+        self.epochs_ls, self.bn_mean_ls = [], []
         self.MS = ModelSaver(self.save_dir)
         self.txt_log = txtLogger(self.save_dir, self.metrics)
         self.bn_log = BNLogger(self.save_dir)
         self.tb_manager = TensorboardManager(self.save_dir, self.metrics)
-
-    def record_args(self, args):
-        self.model_idx = self.save_dir.split("/")[-1]
-        self.epochs = args.epochs
-        self.sparse = args.sparse
-        self.save_interval = args.save_interval
-        self.data_path = args.data_path
-        self.label_path = args.label_path
-        self.batch_size = args.batch_size
-        self.num_worker = args.num_worker
-        self.iterations = args.iteration
+        self.logs = LoggerManager(args, self.metrics, self.cls_metrics)
 
     def update(self, model, metrics, epoch, phase, cls_metrics=()):
-        self.epochs.append(epoch)
+        self.epochs_ls.append(epoch)
         self.txt_log.update(epoch, phase, metrics)
         self.tb_manager.update(metrics, phase, epoch, model)
-
-        if phase == "train":
-            bn_ave = self.calculate_BN(model)
-            self.bn_mean_ls.append(bn_ave)
-            self.bn_log.update(epoch, bn_ave)
 
         epoch = -1 if epoch % self.save_interval != 0 else epoch
         updated_metrics = []
@@ -70,6 +56,13 @@ class TrainRecorder:
                 self.cls_metrics_record[phase][metric_idx][cls_idx].append(
                     cls_metrics[metric_idx][cls_idx]
                 )
+
+        if phase == "train":
+            bn_ave = self.calculate_BN(model)
+            self.bn_mean_ls.append(bn_ave)
+            self.bn_log.update(epoch, bn_ave)
+        elif phase == "val":
+            self.logs.update(self.epochs_ls[-1], self.metrics_record, self.cls_metrics_record)
 
     def calculate_BN(self, model):
         bn_sum, bn_num = 0, 0
