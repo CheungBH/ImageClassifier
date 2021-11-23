@@ -24,8 +24,8 @@ class TrainRecorder:
             if direct == "down":
                 best_template[idx] = float("inf")
 
-        self.metrics_record = {"train": [[] for _ in range(len(metrics))],
-                               "val": [[] for _ in range(len(metrics))]}
+        self.metrics_record = {"train": copy.deepcopy([[] for _ in range(len(metrics))]),
+                               "val": copy.deepcopy([[] for _ in range(len(metrics))])}
         self.best_recorder = {"train": best_template, "val": best_template}
         cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
         self.cls_metrics_record = {"train": copy.deepcopy(cls_metric_template),
@@ -55,15 +55,13 @@ class TrainRecorder:
             if compare(record, metric, direction):
                 updated_metrics.append(m_name)
                 self.best_recorder[phase][idx] = metric
-        self.MS.update(model, epoch, updated_metrics)
-
         for metric_idx in range(len(self.cls_metrics)):
             for cls_idx in range(self.cls_num):
                 self.cls_metrics_record[phase][metric_idx][cls_idx].append(
                     cls_metrics[metric_idx][cls_idx]
                 )
-
         if phase == "val":
+            self.MS.update(model, epoch, updated_metrics)
             self.logs.update(self.epochs_ls[-1], self.metrics_record, self.cls_metrics_record)
 
     def release(self):
@@ -87,10 +85,15 @@ class TestRecorder:
         self.cls_metrics = args.cls_metrics
         self.auto = args.auto
         self.cls_num = args.cls_num
-        self.cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
-        self.best_recorder = [0 for _ in range(len(self.metrics))]
+        self.cls_metric = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
+        self.best_recorder = {"test": 0 for _ in range(len(self.metrics))}
 
     def process(self, metrics, cls_metrics):
-        pass
+        for metric_idx in range(len(self.cls_metrics)):
+            for cls_idx in range(self.cls_num):
+                self.cls_metric[metric_idx][cls_idx] = cls_metrics[metric_idx][cls_idx]
+        for idx, (metric) in enumerate(metrics):
+            self.best_recorder["test"][idx] = metric
+        print_final_result(self.best_recorder, self.metrics)
 
 
