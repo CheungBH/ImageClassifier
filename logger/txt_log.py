@@ -2,15 +2,19 @@ import os
 
 
 class txtLogger:
-    def __init__(self, folder, metrics):
+    def __init__(self, folder, metrics, round_size=(8, 4, 4, 4)):
         self.folder = folder
         self.metrics = metrics
+        self.round_size = round_size
+        if self.round_size:
+            assert len(round_size) == len(metrics)
 
     def update(self, epoch, phase, metrics):
+        phase = "valid" if phase == "val" else phase
         with open(os.path.join(self.folder, "log.txt"), "a+") as f:
             out = "{}: {} | ".format(phase, epoch)
-            for metric, name in zip(metrics, self.metrics):
-                out += "{}: {} | ".format(name, metric)
+            for metric, name, size in zip(metrics, self.metrics, self.round_size):
+                out += "{}: {} | ".format(name, round(metric, size))
             f.write(out + "\n")
             if phase == "val":
                 f.write("---------------------------------------------\n")

@@ -52,7 +52,7 @@ class LoggerManager:
         for metric in self.cls_metrics:
             for phase in self.phases:
                 for label in self.labels:
-                    string += "{}_{}_{}".format(phase, metric, label)
+                    string += "{}_{}_{},".format(phase, metric, label)
                 string += ","
         return string[:-1]
 
