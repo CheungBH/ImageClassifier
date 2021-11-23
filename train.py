@@ -7,7 +7,6 @@ from trainer.criterion import CriteriaInitializer
 from trainer.utils import resume
 from eval.evaluate import EpochEvaluator, MetricCalculator
 from logger.record import TrainRecorder
-import os
 
 import torch
 from tqdm import tqdm
@@ -112,7 +111,7 @@ def train(args):
         args.start_epoch = epoch
         args.train_loss, args.train_acc, args.train_auc, args.train_pr, args.val_loss, args.val_acc, args.val_auc, \
             args.val_pr = TR.get_best_metrics()
-        torch.save(args, os.path.join(args.save_dir))
+        TR.save_option(args)
         print("------------------------------------------------------------------------")
     TR.release()
 

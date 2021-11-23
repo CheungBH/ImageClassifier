@@ -72,3 +72,6 @@ class TrainRecorder:
         for phase in ["train", "val"]:
             metrics += self.best_recorder[phase]
         return metrics
+
+    def save_option(self, args):
+        torch.save(args, os.path.join(args.save_dir, "option.pkl"))
