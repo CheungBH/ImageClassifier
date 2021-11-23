@@ -2,6 +2,7 @@ from .model_storage import ModelSaver
 from .txt_log import txtLogger, BNLogger
 from .tb_manager import TensorboardManager
 from .log_manager import LoggerManager
+from .graph import GraphSaver
 from .utils import *
 import os
 import copy
@@ -35,6 +36,7 @@ class TrainRecorder:
         self.bn_log = BNLogger(self.save_dir)
         self.tb_manager = TensorboardManager(self.save_dir, self.metrics)
         self.logs = LoggerManager(args, self.metrics, self.cls_metrics)
+        self.graph = GraphSaver(self.save_dir, self.metrics)
 
     def update(self, model, metrics, epoch, phase, cls_metrics=()):
         self.epochs_ls.append(epoch)
@@ -66,6 +68,7 @@ class TrainRecorder:
 
     def release(self):
         self.logs.release(self.best_recorder)
+        self.graph.process(self.epochs_ls, self.metrics_record)
 
     def get_best_metrics(self):
         metrics = []
