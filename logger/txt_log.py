@@ -16,8 +16,8 @@ class txtLogger:
             for metric, name, size in zip(metrics, self.metrics, self.round_size):
                 out += "{}: {} | ".format(name, round(metric, size))
             f.write(out + "\n")
-            if phase == "val":
-                f.write("---------------------------------------------\n")
+            if phase == "valid":
+                f.write("-------------------------------------------------------\n")
 
 
 class BNLogger:

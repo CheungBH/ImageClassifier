@@ -63,14 +63,15 @@ class LoggerManager:
         return string[:-1]
 
     def release(self, best_recorder):
-        summary_log_value = [self.model_idx, self.data_name, self.trainval_ratio, self.backbone, self.freeze,
-                             self.batch_size, self.epochs, self.sparse, self.load_weight, self.optMethod, self.LR,
-                             self.momentum, self.weightDecay, self.schedule, self.schedule_gamma, self.crit, "",
-                             self.flops, self.params, self.inf_time]
-        for phase in ["train", "val"]:
-            for idx in range(len(self.metrics)):
-                summary_log_value.append(best_recorder[phase][idx])
-        self.summary_logger.write(summary_log_value)
+        if self.auto:
+            summary_log_value = [self.model_idx, self.data_name, self.trainval_ratio, self.backbone, self.freeze,
+                                 self.batch_size, self.epochs, self.sparse, self.load_weight, self.optMethod, self.LR,
+                                 self.momentum, self.weightDecay, self.schedule, self.schedule_gamma, self.crit, "",
+                                 self.flops, self.params, self.inf_time]
+            for phase in ["train", "val"]:
+                for idx in range(len(self.metrics)):
+                    summary_log_value.append(best_recorder[phase][idx])
+            self.summary_logger.write(summary_log_value)
 
     def update(self, epoch, metrics, cls_metrics):
         individual_log_value = [epoch]
