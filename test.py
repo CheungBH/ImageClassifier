@@ -46,6 +46,7 @@ def test(args):
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
+    TR = TestRecorder(args, ["loss", "acc", "auc", "pr"], ["acc", "auc", "pr"], data_loader.cls_num)
 
     for i, (names, inputs, labels) in enumerate(loader_desc):
         inputs = inputs.to(device)
@@ -69,8 +70,7 @@ def test(args):
         )
 
     loss, acc, auc, pr, cls_metrics = EpochEval.calculate()
-    print('Test: loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-            format(loss=loss, acc=acc, AUC=auc, PR=pr))
+    TR.process([loss, acc, auc, pr], cls_metrics)
 
 
 if __name__ == '__main__':

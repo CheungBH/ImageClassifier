@@ -80,11 +80,10 @@ class TrainRecorder:
 
 
 class TestRecorder:
-    def __init__(self, args):
-        self.metrics = args.metrics
-        self.cls_metrics = args.cls_metrics
-        self.auto = args.auto
-        self.cls_num = args.cls_num
+    def __init__(self, args, metrics, cls_metrics, cls_num):
+        self.metrics = metrics
+        self.cls_metrics = cls_metrics
+        self.cls_num = cls_num
         self.cls_metric = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
         self.best_recorder = {"test": 0 for _ in range(len(self.metrics))}
 
