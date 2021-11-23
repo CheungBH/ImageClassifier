@@ -66,3 +66,9 @@ class TrainRecorder:
 
     def release(self):
         self.logs.release(self.best_recorder)
+
+    def get_best_metrics(self):
+        metrics = []
+        for phase in ["train", "val"]:
+            metrics += self.best_recorder[phase]
+        return metrics

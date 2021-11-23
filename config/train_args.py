@@ -13,6 +13,7 @@ parser.add_argument('--freeze', default=0, type=int)
 '''train configuration'''
 parser.add_argument('--batch_size', default=32, type=int)
 parser.add_argument('--epochs', default=20, type=int)
+parser.add_argument('--start_epoch', default=0, type=int)
 parser.add_argument('--num_worker', default=1, type=int)
 parser.add_argument('--iteration', default=0, type=int)
 parser.add_argument('--sparse', default=0, type=float)

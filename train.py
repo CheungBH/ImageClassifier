@@ -4,8 +4,10 @@ from dataset.dataloader import DataLoader
 from trainer.optimizer import OptimizerInitializer
 from trainer.scheduler import SchedulerInitializer
 from trainer.criterion import CriteriaInitializer
+from trainer.utils import resume
 from eval.evaluate import EpochEvaluator, MetricCalculator
 from logger.record import TrainRecorder
+import os
 
 import torch
 from tqdm import tqdm
@@ -17,6 +19,9 @@ except ImportError:
 
 
 def train(args):
+    if args.resume:
+        args = resume(args)
+
     device = args.device
 
     epochs = args.epochs
@@ -51,7 +56,7 @@ def train(args):
     if mix_precision:
         m, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 
-    for epoch in range(epochs):
+    for epoch in range(epochs)[args.start_epoch:]:
         for phase in ["train", "val"]:
             EpochEval = EpochEvaluator(data_loader.cls_num)
             BatchEval = MetricCalculator()
@@ -103,6 +108,12 @@ def train(args):
             schedule.update(phase, "epoch")
             loss, acc, auc, pr, cls_metric = EpochEval.calculate()
             TR.update(model, (loss, acc, auc, pr), epoch, phase, cls_metric)
+        args.iterations = iterations
+        args.start_epoch = epoch
+        args.train_loss, args.train_acc, args.train_auc, args.train_pr, args.val_loss, args.val_acc, args.val_auc, \
+            args.val_pr = TR.get_best_metrics()
+        torch.save(args, os.path.join(args.save_dir))
+        print("------------------------------------------------------------------------")
     TR.release()
 
 
