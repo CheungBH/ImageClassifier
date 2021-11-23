@@ -42,6 +42,9 @@ class ModelBuilder:
         self.write_structure(os.path.join(args.save_dir, "model.txt"), model)
         return model
 
+    def get_benchmark(self, input_size=224):
+        return self.CNN.get_benchmark(input_size)
+
     def inference(self, img_tns):
         img_tensor_list = [torch.unsqueeze(img_tns, 0)]
         input_tensor = torch.cat(tuple(img_tensor_list), dim=0)

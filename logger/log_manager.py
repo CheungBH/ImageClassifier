@@ -7,8 +7,9 @@ class LoggerManager:
         self.record_args(args)
         self.metrics = metrics
         self.cls_metrics = cls_metrics
-        self.summary_logger = CustomizedLogger("/".join(self.save_dir.split("/")[:-1]), self.summary_csv_title(),
-                                               "train_result")
+        if self.auto:
+            self.summary_logger = CustomizedLogger("/".join(self.save_dir.split("/")[:-1]), self.summary_csv_title(),
+                                                   "train_result")
         self.individual_logger = CustomizedLogger(self.save_dir, self.individual_csv_title(), self.model_idx)
 
     def record_args(self, args):
@@ -34,9 +35,14 @@ class LoggerManager:
         self.schedule_gamma = args.schedule_gamma
         self.crit = args.crit
 
+        self.auto = args.auto
+        self.flops = args.flops
+        self.params = args.params
+        self.inf_time = args.inf_time
+
     def summary_csv_title(self):
         string = "idx,dataset,trainval_ratio,backbone,freeze,batch_size,epochs,sparse,load_weight,optMethod,LR," \
-                  "momentum,weight_decay,schedule,schedule_gamma,crit,,"
+                  "momentum,weight_decay,schedule,schedule_gamma,crit,,flops,params,inf_time"
 
         for phase in self.phases:
             for metric in self.metrics:
@@ -59,7 +65,8 @@ class LoggerManager:
     def release(self, best_recorder):
         summary_log_value = [self.model_idx, self.data_name, self.trainval_ratio, self.backbone, self.freeze,
                              self.batch_size, self.epochs, self.sparse, self.load_weight, self.optMethod, self.LR,
-                             self.momentum, self.weightDecay, self.schedule, self.schedule_gamma, self.crit, ""]
+                             self.momentum, self.weightDecay, self.schedule, self.schedule_gamma, self.crit, "",
+                             self.flops, self.params, self.inf_time]
         for phase in ["train", "val"]:
             for idx in range(len(self.metrics)):
                 summary_log_value.append(best_recorder[phase][idx])

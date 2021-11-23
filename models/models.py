@@ -4,7 +4,8 @@ import torch.nn as nn
 import torchvision.models as models
 from torch.nn import functional as F
 import torch
-import os
+from .benchmark import print_model_param_flops, print_model_param_nums, get_inference_time
+
 
 device = "cuda:0"
 
@@ -149,10 +150,14 @@ class CNNModel(object):
         else:
             raise ValueError("Your pretrain model name is wrong!")
 
-
-
     def load(self, weight_path):
         self.model.load_state_dict(torch.load(weight_path, map_location=device))
+
+    def get_benchmark(self, input_size=224):
+        flops = print_model_param_flops(self.model)
+        params = print_model_param_nums(self.model)
+        inf_time = get_inference_time(self.model, height=input_size, width=input_size)
+        return flops, params, inf_time
 
 
 if __name__ == "__main__":

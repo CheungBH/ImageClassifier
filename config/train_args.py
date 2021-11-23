@@ -34,5 +34,6 @@ parser.add_argument('--crit', default="CE", type=str)
 parser.add_argument('--save_dir', default="weights", type=str)
 parser.add_argument('--device', default="cuda:0")
 parser.add_argument('--save_interval', default=20, type=int)
+parser.add_argument('--auto', action="store_true")
 
 args = parser.parse_args()
