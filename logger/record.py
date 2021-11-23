@@ -39,7 +39,8 @@ class TrainRecorder:
         self.graph = GraphSaver(self.save_dir, self.metrics)
 
     def update(self, model, metrics, epoch, phase, cls_metrics=()):
-        self.epochs_ls.append(epoch)
+        if phase == "val":
+            self.epochs_ls.append(epoch)
         self.txt_log.update(epoch, phase, metrics)
         self.tb_manager.update(metrics, phase, epoch, model)
 
@@ -78,3 +79,9 @@ class TrainRecorder:
 
     def save_option(self, args):
         torch.save(args, os.path.join(args.save_dir, "option.pkl"))
+
+
+class TestRecorder:
+    def __init__(self, args):
+        self.metrics = args.metrics
+        self.cls_
