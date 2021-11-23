@@ -68,7 +68,7 @@ class LoggerManager:
                                  self.batch_size, self.epochs, self.sparse, self.load_weight, self.optMethod, self.LR,
                                  self.momentum, self.weightDecay, self.schedule, self.schedule_gamma, self.crit, "",
                                  self.flops, self.params, self.inf_time]
-            for phase in ["train", "val"]:
+            for phase in self.phases:
                 for idx in range(len(self.metrics)):
                     summary_log_value.append(best_recorder[phase][idx])
             self.summary_logger.write(summary_log_value)
