@@ -41,6 +41,9 @@ class TrainRecorder:
     def update(self, model, metrics, epoch, phase, cls_metrics=()):
         if phase == "val":
             self.epochs_ls.append(epoch)
+            bn_ave = calculate_BN(model)
+            self.bn_mean_ls.append(bn_ave)
+            self.bn_log.update(epoch, bn_ave)
         self.txt_log.update(epoch, phase, metrics)
         self.tb_manager.update(metrics, phase, epoch, model)
 
@@ -60,11 +63,7 @@ class TrainRecorder:
                     cls_metrics[metric_idx][cls_idx]
                 )
 
-        if phase == "train":
-            bn_ave = calculate_BN(model)
-            self.bn_mean_ls.append(bn_ave)
-            self.bn_log.update(self.epochs_ls[-1], bn_ave)
-        elif phase == "val":
+        if phase == "val":
             self.logs.update(self.epochs_ls[-1], self.metrics_record, self.cls_metrics_record)
 
     def release(self):
