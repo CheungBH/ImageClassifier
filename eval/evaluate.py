@@ -1,7 +1,6 @@
 #-*-coding:utf-8-*-
 import torch
-from sklearn import metrics
-
+from .logger import MetricCalculator, DataLogger, CurveLogger
 
 class EpochEvaluator:
     def __init__(self, num_cls):
@@ -38,46 +37,21 @@ class EpochEvaluator:
         return cls_acc, cls_auc, cls_pr
 
 
-class MetricCalculator:
+class BatchEvaluator:
     def __init__(self):
-        pass
+        self.loss_logger = DataLogger()
+        self.metric_logger = MetricCalculator()
+        self.outputs, self.labels = [], []
 
-    def cal_acc(self, outputs, labels):
-        return ((torch.max(outputs, 1)[1] == labels).sum()).tolist() /len(outputs)
-
-    def cal_auc(self, preds, labels):
-        try:
-            auc = metrics.roc_auc_score(preds, labels)
-        except:
-            auc = 0
-        return auc
-
-    def cal_PR(self, preds, labels):
-        try:
-            P, R, thresh = metrics.precision_recall_curve(preds, labels)
-            area = 0
-            for idx in range(len(thresh)-1):
-                a = (R[idx] - R[idx+1]) * (P[idx+1] + P[idx])/2
-                area += a
-            return area
-        except:
-            return 0
-
-    def get_thresh(self, preds, labels):
-        try:
-            P, R, thresh = metrics.precision_recall_curve(preds, labels)
-            PR_ls = [P[idx] + R[idx] for idx in range(len(P))]
-            max_idx = PR_ls.index(max(PR_ls))
-            return thresh[max_idx]
-        except:
-            return 0
-
-    def calculate_all(self, outputs, labels):
-        acc = self.cal_acc(outputs, labels)
-        _, preds = torch.max(outputs, 1)
-        preds, labels = preds.detach().cpu(), labels.detach().cpu()
-        auc = self.cal_auc(preds, labels)
-        pr = self.cal_PR(preds, labels)
-        return acc, auc, pr
-
-
+    def update(self, loss, outputs, labels):
+        self.loss_logger.update(loss, len(outputs))
+        if len(self.outputs) == 0:
+            self.outputs = outputs
+            self.labels = labels
+        else:
+            self.outputs = torch.cat((self.outputs, outputs), dim=0)
+            self.labels = torch.cat((self.labels, labels), dim=0)
+        loss = self.loss_logger.average()
+        acc = self.metric_logger.cal_acc(self.outputs, self.labels)
+        _, auc, pr = self.metric_logger.calculate_all(self.outputs, self.labels)
+        return loss, acc, auc, pr

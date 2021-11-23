@@ -19,3 +19,11 @@ def compare(before, after, direction):
         return True if after < before else False
     else:
         raise ValueError("Please assign the direction correctly")
+
+
+def print_final_result(best_recorder, metrics, phases=("train", "val")):
+    print("-----Printing final result-----")
+    for phase in phases:
+        for idx, metric in enumerate(metrics):
+            print("Best {} {}: {}".format(phase, metric, best_recorder[phase][idx]))
+    print("-------------------------------")

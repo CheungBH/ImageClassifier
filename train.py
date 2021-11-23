@@ -5,7 +5,7 @@ from trainer.optimizer import OptimizerInitializer
 from trainer.scheduler import SchedulerInitializer
 from trainer.criterion import CriteriaInitializer
 from trainer.utils import resume
-from eval.evaluate import EpochEvaluator, MetricCalculator
+from eval.evaluate import EpochEvaluator, BatchEvaluator
 from logger.record import TrainRecorder
 
 import torch
@@ -58,14 +58,13 @@ def train(args):
     for epoch in range(epochs)[args.start_epoch:]:
         for phase in ["train", "val"]:
             EpochEval = EpochEvaluator(data_loader.cls_num)
-            BatchEval = MetricCalculator()
+            BatchEval = BatchEvaluator()
             model.train() if phase == "train" else model.eval()
 
             loader_desc = tqdm(data_loader.dataloaders_dict[phase])
 
             for i, (names, inputs, labels) in enumerate(loader_desc):
 
-                iterations += 1
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
@@ -83,6 +82,7 @@ def train(args):
                         loss = criterion(outputs, labels)
 
                 if phase == 'train':
+                    iterations += 1
                     if mix_precision:
                         with amp.scale_loss(loss, optimizer) as scaled_loss:
                             scaled_loss.backward()
@@ -98,10 +98,10 @@ def train(args):
                     schedule.update(phase, "iter")
 
                 EpochEval.update(outputs, labels, loss)
-                batch_acc, batch_auc, batch_pr = BatchEval.calculate_all(outputs, labels)
+                batch_loss, batch_acc, batch_auc, batch_pr = BatchEval.update(loss, outputs, labels)
                 loader_desc.set_description(
                     '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-                        format(phase=phase, epoch=epoch, loss=loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
+                        format(phase=phase, epoch=epoch, loss=batch_loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
                 )
 
             schedule.update(phase, "epoch")

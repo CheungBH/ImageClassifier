@@ -4,6 +4,7 @@ from dataset.utils import image_normalize, read_labels, get_pretrain
 from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
 from eval.evaluate import EpochEvaluator, MetricCalculator
+from logger.record import TestRecorder
 import torch
 from tqdm import tqdm
 import torch.nn as nn

@@ -54,7 +54,7 @@ class TrainRecorder:
             self.metrics_record[phase][idx].append(metric)
             if compare(record, metric, direction):
                 updated_metrics.append(m_name)
-                self.best_recorder[idx] = metric
+                self.best_recorder[phase][idx] = metric
         self.MS.update(model, epoch, updated_metrics)
 
         for metric_idx in range(len(self.cls_metrics)):
@@ -69,6 +69,7 @@ class TrainRecorder:
     def release(self):
         self.logs.release(self.best_recorder)
         self.graph.process(self.epochs_ls, self.metrics_record)
+        print_final_result(self.best_recorder, self.metrics)
 
     def get_best_metrics(self):
         metrics = []
@@ -84,8 +85,12 @@ class TestRecorder:
     def __init__(self, args):
         self.metrics = args.metrics
         self.cls_metrics = args.cls_metrics
+        self.auto = args.auto
         self.cls_num = args.cls_num
         self.cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
-        best_template = [0 for _ in range(len(self.metrics))]
+        self.best_recorder = [0 for _ in range(len(self.metrics))]
+
+    def process(self, metrics, cls_metrics):
+        pass
 
 
