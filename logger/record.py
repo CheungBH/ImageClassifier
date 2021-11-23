@@ -26,7 +26,7 @@ class TrainRecorder:
 
         self.metrics_record = {"train": copy.deepcopy([[] for _ in range(len(metrics))]),
                                "val": copy.deepcopy([[] for _ in range(len(metrics))])}
-        self.best_recorder = {"train": best_template, "val": best_template}
+        self.best_recorder = {"train": copy.deepcopy(best_template), "val": copy.deepcopy(best_template)}
         cls_metric_template = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
         self.cls_metrics_record = {"train": copy.deepcopy(cls_metric_template),
                                    "val": copy.deepcopy(cls_metric_template)}
