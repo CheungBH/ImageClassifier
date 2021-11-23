@@ -5,8 +5,8 @@ import os
 import torch
 import torch.hub
 from test_model import Tester
-from Grad_CAM.grad_cam import GradCAM
-from Grad_CAM.utils import save_gradcam,preprocess
+from gradcam.grad_cam import GradCAM
+from gradcam.utils import save_gradcam,preprocess
 
 
 def get_gram(model_path,img_path,target_layers):
