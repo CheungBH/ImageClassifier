@@ -93,6 +93,4 @@ class TestRecorder:
                 self.cls_metric[metric_idx][cls_idx] = cls_metrics[metric_idx][cls_idx]
         for idx, (metric) in enumerate(metrics):
             self.best_recorder["test"][idx] = metric
-        print_final_result(self.best_recorder, self.metrics)
-
-
+        print_final_result(self.best_recorder, self.metrics, phases=("test", ))
