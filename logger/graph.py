@@ -5,7 +5,7 @@ import os
 
 class GraphSaver:
     def __init__(self, save_dir, metrics, phases=("train", "val")):
-        self.save_dir = save_dir
+        self.save_dir = os.path.join(save_dir, "graph")
         os.makedirs(self.save_dir, exist_ok=True)
         self.metrics = metrics
         self.phases = phases
