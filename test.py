@@ -1,9 +1,9 @@
 #-*-coding:utf-8-*-
 
-from dataset.utils import image_normalize, read_labels, get_pretrain
+from dataset.utils import get_pretrain
 from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
-from eval.evaluate import EpochEvaluator, MetricCalculator
+from eval.evaluate import EpochEvaluator, BatchEvaluator
 from logger.record import TestRecorder
 import torch
 from tqdm import tqdm
@@ -42,7 +42,7 @@ def test(args):
     criterion = nn.CrossEntropyLoss()
 
     EpochEval = EpochEvaluator(data_loader.cls_num)
-    BatchEval = MetricCalculator()
+    BatchEval = BatchEvaluator()
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
@@ -63,10 +63,10 @@ def test(args):
                 loss = criterion(outputs, labels)
 
         EpochEval.update(outputs, labels, loss)
-        batch_acc, batch_auc, batch_pr = BatchEval.calculate_all(outputs, labels)
+        batch_loss, batch_acc, batch_auc, batch_pr = BatchEval.update(loss, outputs, labels)
         loader_desc.set_description(
             'Test: loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-                format(loss=loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
+                format(loss=batch_loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
         )
 
     loss, acc, auc, pr, cls_metrics = EpochEval.calculate()

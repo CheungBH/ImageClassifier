@@ -85,7 +85,7 @@ class TestRecorder:
         self.cls_metrics = cls_metrics
         self.cls_num = cls_num
         self.cls_metric = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
-        self.best_recorder = {"test": 0 for _ in range(len(self.metrics))}
+        self.best_recorder = {"test": [0 for _ in range(len(self.metrics))]}
 
     def process(self, metrics, cls_metrics):
         for metric_idx in range(len(self.cls_metrics)):
