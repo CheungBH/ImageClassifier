@@ -47,7 +47,7 @@ class LoggerManager:
         for phase in self.phases:
             for metric in self.metrics:
                 string += "{}_{},".format(phase, metric)
-        return string[:-1]
+        return string[:-1] + "\n"
 
     def individual_csv_title(self):
         string = "epoch, "
@@ -60,7 +60,7 @@ class LoggerManager:
                 for label in self.labels:
                     string += "{}_{}_{},".format(phase, metric, label)
                 string += ","
-        return string[:-1]
+        return string[:-1] + "\n"
 
     def release(self, best_recorder):
         if self.auto:
