@@ -4,11 +4,10 @@ import os
 
 
 class GraphSaver:
-    def __init__(self, save_dir, metrics, phases=("train", "val")):
+    def __init__(self, save_dir, metrics):
         self.save_dir = os.path.join(save_dir, "graph")
         os.makedirs(self.save_dir, exist_ok=True)
         self.metrics = metrics
-        self.phases = phases
 
     def draw_graph(self, epoch_ls, train_ls, val_ls, name):
         ln1, = plt.plot(epoch_ls, train_ls, color='red', linewidth=3.0, linestyle='--')
