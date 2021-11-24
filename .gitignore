@@ -58,7 +58,6 @@ runs
 weight/saved
 src/config.py
 train_log.log
-auto_training.py
 train_result/tmp.txt
 weight
 result
@@ -68,4 +67,5 @@ src/tv
 *.pt
 error.txt
 config/config.py
+cmd.py
 weights/*
