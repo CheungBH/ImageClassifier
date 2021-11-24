@@ -85,3 +85,39 @@ class LoggerManager:
                     individual_log_value.append(cls_metrics[phase][i][j][-1])
                 individual_log_value.append("")
         self.individual_logger.write(individual_log_value)
+
+
+class TestLoggerManager:
+    def __init__(self, args, metrics, cls_metrics, phases=("train", "val")):
+        self.phases = phases
+        self.metrics = metrics
+        self.cls_metrics = cls_metrics
+        self.labels = args.labels
+        self.model_path = args.model_path
+        self.logger = CustomizedLogger(self.get_csv_folder(self.model_path), self.csv_title(), "test_result")
+
+    @staticmethod
+    def get_csv_folder(path):
+        return "/".join(path.split("/")[:-2])
+
+    def csv_title(self):
+        string = "model_name,"
+        for metric in self.metrics:
+            for phase in self.phases:
+                string += "{}_{},".format(phase, metric)
+        for metric in self.cls_metrics:
+            for phase in self.phases:
+                for label in self.labels:
+                    string += "{}_{}_{},".format(phase, metric, label)
+        return string[:-1] + "\n"
+
+    def update(self, metrics, cls_metrics):
+        individual_log_value = [self.model_path]
+        for idx in range(len(self.metrics)):
+            for phase in self.phases:
+                individual_log_value.append(metrics[phase][idx][-1])
+        for i in range(len(self.cls_metrics)):
+            for phase in self.phases:
+                for j in range(len(self.labels)):
+                    individual_log_value.append(cls_metrics[phase][i][j][-1])
+        self.logger.write(individual_log_value)

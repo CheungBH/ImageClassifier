@@ -1,7 +1,7 @@
 from .model_storage import ModelSaver
 from .txt_log import txtLogger, BNLogger
 from .tb_manager import TensorboardManager
-from .log_manager import LoggerManager
+from .log_manager import LoggerManager, TestLoggerManager
 from .graph import GraphSaver
 from .utils import *
 from .metric_manger import MetricManager
@@ -51,11 +51,16 @@ class TrainRecorder:
 
 
 class TestRecorder:
-    def __init__(self, metrics, cls_metrics, cls_num):
+    def __init__(self, args, metrics, cls_metrics, cls_num):
         self.metrics_name = metrics
         self.metrics = MetricManager(metrics, cls_metrics, cls_num, phases=("test", ))
+        self.auto = args.auto
+        if self.auto:
+            self.logger = TestLoggerManager(args, metrics, cls_metrics, phases=("test", ))
 
     def process(self, metrics, cls_metrics):
         self.metrics.update(metrics, "test", cls_metrics)
         metrics, cls_metrics = self.metrics.get_current_metrics()
         print_final_result(metrics, self.metrics_name, phases=("test", ))
+        if self.auto:
+            self.logger.update(metrics, cls_metrics)

@@ -2,6 +2,7 @@
 import torch
 from .logger import MetricCalculator, DataLogger, CurveLogger
 
+
 class EpochEvaluator:
     def __init__(self, num_cls):
         self.cls_MCs = [MetricCalculator() for _ in range(num_cls)]

@@ -39,6 +39,7 @@ def test(args):
 
     data_loader = DataLoader(phases=(phase,))
     data_loader.build(data_path, label_path, inp_size, batch_size, num_worker)
+    args.labels = data_loader.label
 
     MB = ModelBuilder()
     model = MB.build(data_loader.cls_num, backbone)
@@ -50,7 +51,7 @@ def test(args):
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
-    TR = TestRecorder(metric_names, cls_metric_names, data_loader.cls_num)
+    TR = TestRecorder(args, metric_names, cls_metric_names, data_loader.cls_num)
 
     for i, (names, inputs, labels) in enumerate(loader_desc):
         inputs = inputs.to(device)
@@ -87,6 +88,7 @@ if __name__ == '__main__':
     parser.add_argument('--phase', default="val")
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--num_worker', default=1, type=int)
+    parser.add_argument('--auto', action="store_true")
     args = parser.parse_args()
 
     test(args)
