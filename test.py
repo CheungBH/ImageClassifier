@@ -14,6 +14,10 @@ try:
 except ImportError:
     mix_precision = False
 
+import config.config as config
+metric_names = config.metric_names
+cls_metric_names = config.cls_metric_names
+
 
 def test(args):
     device = "cuda:0"
@@ -46,7 +50,7 @@ def test(args):
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
-    TR = TestRecorder(["loss", "acc", "auc", "pr"], ["acc", "auc", "pr"], data_loader.cls_num)
+    TR = TestRecorder(metric_names, cls_metric_names, data_loader.cls_num)
 
     for i, (names, inputs, labels) in enumerate(loader_desc):
         inputs = inputs.to(device)

@@ -16,6 +16,11 @@ try:
 except ImportError:
     mix_precision = False
 
+import config.config as config
+metric_names = config.metric_names
+metric_directions = config.metric_directions
+cls_metric_names = config.cls_metric_names
+
 
 def train(args):
     if args.resume:
@@ -50,7 +55,7 @@ def train(args):
     schedule = SchedulerInitializer()
     schedule.get(args, optimizer)
 
-    TR = TrainRecorder(args, ["loss", "acc", "auc", "pr"], ["down", "up", "up", "up"], ["acc", "auc", "pr"])
+    TR = TrainRecorder(args, metric_names, metric_directions, cls_metric_names)
 
     if mix_precision:
         m, optimizer = amp.initialize(model, optimizer, opt_level="O1")
