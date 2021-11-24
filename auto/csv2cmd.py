@@ -41,7 +41,7 @@ def csvTransform(file):
                     tmp += " "
                     valid = True
 
-        tmp += '--save_dir {} --auto'.format(os.path.join("weights", task_folder, base_name, str(idx+1)))
+        tmp += '--save_dir {} --auto'.format(os.path.join("weights", task_folder + base_name, str(idx+1)))
         cmd = begin + tmp + "'\n"
         if valid:
             cmds.append(cmd)
