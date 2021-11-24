@@ -66,6 +66,6 @@ src/tv
 *.onnx
 *.pt
 error.txt
-config/config.py
+*/config.py
 cmd.py
 weights/*
