@@ -104,9 +104,9 @@ def train(args):
                         format(phase=phase, epoch=epoch, loss=batch_loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
                 )
 
-            schedule.update(phase, "epoch")
             loss, acc, auc, pr, cls_metric = EpochEval.calculate()
             TR.update(model, (loss, acc, auc, pr), epoch, phase, cls_metric)
+        schedule.update(phase, "epoch")
         args.iterations = iterations
         args.start_epoch = epoch
         args.train_loss, args.train_acc, args.train_auc, args.train_pr, args.val_loss, args.val_acc, args.val_auc, \

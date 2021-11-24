@@ -20,7 +20,7 @@ class TrainRecorder:
         self.tb_manager = TensorboardManager(args.save_dir, metrics)
         self.logs = LoggerManager(args, metrics, cls_metrics, phases=phases)
         self.graph = GraphSaver(args.save_dir, metrics)
-        self.metrics = MetricManager(metrics, directions, cls_metrics, args.cls_num, phases=phases)
+        self.metrics = MetricManager(metrics, cls_metrics, args.cls_num, directions, phases=phases)
 
     def update(self, model, metrics, epoch, phase, cls_metrics=()):
         ms_epoch = -1 if epoch % self.save_interval != 0 else epoch
@@ -51,17 +51,11 @@ class TrainRecorder:
 
 
 class TestRecorder:
-    def __init__(self, args, metrics, cls_metrics, cls_num):
-        self.metrics = metrics
-        self.cls_metrics = cls_metrics
-        self.cls_num = cls_num
-        self.cls_metric = [[[] for _ in range(self.cls_num)] for _ in range(len(self.cls_metrics))]
-        self.best_recorder = {"test": [0 for _ in range(len(self.metrics))]}
+    def __init__(self, metrics, cls_metrics, cls_num):
+        self.metrics_name = metrics
+        self.metrics = MetricManager(metrics, cls_metrics, cls_num, phases=("test", ))
 
     def process(self, metrics, cls_metrics):
-        for metric_idx in range(len(self.cls_metrics)):
-            for cls_idx in range(self.cls_num):
-                self.cls_metric[metric_idx][cls_idx] = cls_metrics[metric_idx][cls_idx]
-        for idx, (metric) in enumerate(metrics):
-            self.best_recorder["test"][idx] = metric
-        print_final_result(self.best_recorder, self.metrics, phases=("test", ))
+        self.metrics.update(metrics, "test", cls_metrics)
+        metrics, cls_metrics = self.metrics.get_current_metrics()
+        print_final_result(metrics, self.metrics_name, phases=("test", ))

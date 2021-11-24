@@ -46,7 +46,7 @@ def test(args):
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
-    TR = TestRecorder(args, ["loss", "acc", "auc", "pr"], ["acc", "auc", "pr"], data_loader.cls_num)
+    TR = TestRecorder(["loss", "acc", "auc", "pr"], ["acc", "auc", "pr"], data_loader.cls_num)
 
     for i, (names, inputs, labels) in enumerate(loader_desc):
         inputs = inputs.to(device)
