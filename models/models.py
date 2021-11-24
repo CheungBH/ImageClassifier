@@ -76,22 +76,27 @@ class CNNModel(object):
             self.model.fc = nn.Linear(num_ftrs, num_classes)
             # input_size = 299
         elif model_name == "resnet18":
-            from prune.resnet_18_prune import ResNet, BasicBlock
-            self.model = ResNet(BasicBlock, [2, 2, 2, 2], cfg)
+            self.model = models.resnet18()
             if load_pretrain:
                 self.model.load_state_dict(torch.load("weights/pretrain/%s.pth" % model_name, map_location=device))
-            if opt.loadModel:
-                if "pre" in opt.loadModel:
-                    self.model.load_state_dict(torch.load(opt.loadModel, map_location=device))
-                    num_ftrs = self.model.fc.in_features
-                    self.model.fc = nn.Linear(num_ftrs, num_classes)
-                else:
-                    num_ftrs = self.model.fc.in_features
-                    self.model.fc = nn.Linear(num_ftrs, num_classes)
-                    self.model.load_state_dict(torch.load(opt.loadModel, map_location=device))
-            else:
-                num_ftrs = self.model.fc.in_features
-                self.model.fc = nn.Linear(num_ftrs, num_classes)
+            num_ftrs = self.model.fc.in_features
+            self.model.fc = nn.Linear(num_ftrs, num_classes)
+            # from prune.resnet_18_prune import ResNet, BasicBlock
+            # self.model = ResNet(BasicBlock, [2, 2, 2, 2], cfg)
+            # if load_pretrain:
+            #     self.model.load_state_dict(torch.load("weights/pretrain/%s.pth" % model_name, map_location=device))
+            # if opt.loadModel:
+            #     if "pre" in opt.loadModel:
+            #         self.model.load_state_dict(torch.load(opt.loadModel, map_location=device))
+            #         num_ftrs = self.model.fc.in_features
+            #         self.model.fc = nn.Linear(num_ftrs, num_classes)
+            #     else:
+            #         num_ftrs = self.model.fc.in_features
+            #         self.model.fc = nn.Linear(num_ftrs, num_classes)
+            #         self.model.load_state_dict(torch.load(opt.loadModel, map_location=device))
+            # else:
+            #     num_ftrs = self.model.fc.in_features
+            #     self.model.fc = nn.Linear(num_ftrs, num_classes)
             # input_size = 224
         elif model_name == "resnet34":
             self.model = models.resnet34()
