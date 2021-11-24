@@ -58,6 +58,7 @@ class DataLoader_old(object):
                                                                 shuffle=True, num_workers=num_worker)
                             for x in phases}
         self.cls_num = len(self.image_datasets[phases[0]].label)
+        self.phases = phases
 
     def get_labels(self, img_dir, label_path):
         if label_path:
@@ -66,7 +67,7 @@ class DataLoader_old(object):
         if os.path.exists(label_path):
             return read_labels(label_path)
         else:
-            phase_dir = os.path.join(img_dir, "train")
+            phase_dir = os.path.join(img_dir, self.phases[0])
             labels = [cls for cls in os.listdir(phase_dir) if os.path.isdir(os.path.join(phase_dir, cls))]
             with open(label_path, "w") as f:
                 for label in labels:
