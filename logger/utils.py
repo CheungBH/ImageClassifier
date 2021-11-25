@@ -53,12 +53,10 @@ def convert_csv(path):
     data.to_csv(path, header=0)
 
 
-def merge_csv(file1, file2, out_file):
+def merge_csv(files, out_file):
     import pandas as pd
-    f1 = pd.read_csv(file1)
-    f2 = pd.read_csv(file2)
-    file = [f1,f2]
-    train = pd.concat(file)
+    content = [pd.read_csv(file) for file in files]
+    train = pd.concat(content)
     train.to_csv(out_file, index=0, sep=',')
 
 

@@ -71,10 +71,10 @@ class ErrorAnalyserRecorder:
     def __init__(self, model_name, metric_names=(), auto=False):
         self.metric_names = metric_names
         self.name = []
-        self.records = [[] for _ in range(len(self.metric_names))]
-        self.folder = "/".join(model_name.split("/")[:-2])
-        self.model_name = model_name
         self.auto = auto
+        self.records = [[] for _ in range(len(self.metric_names))]
+        self.folder = "/".join(model_name.split("/")[:-2]) if self.auto else "/".join(model_name.split("/")[:-1])
+        self.model_name = model_name
 
     def update(self, name, metrics):
         self.name.append(name)
@@ -86,5 +86,7 @@ class ErrorAnalyserRecorder:
             logger = CustomizedLogger(self.folder, "model_name," + list2str(self.name)+"\n",
                                       "error_analyse_{}".format(self.metric_names[idx]))
             logger.write([self.model_name] + self.records[idx])
-        # if not self.auto:
-
+        if not self.auto:
+            loggers_name = [os.path.join(self.folder, "error_analyse_{}".format(metric)) for metric in
+                            self.metric_names]
+            merge_csv(loggers_name, os.path.join(self.folder, "error_analyse.csv"))
