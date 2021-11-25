@@ -23,9 +23,7 @@ class AutoProcessor:
         else:
             self.model_ls, self.option_ls = init_model_list(model_folder)
         self.display_interval = display_interval
-        self.processor = {}
-        for key, value in process_args.items():
-            self.processor[key] = process_mapping[key](*value)
+        self.processor = {key: process_mapping[key](*value) for key, value in process_args.items()}
 
     def process(self):
         for process_type, processor in self.processor.items():
