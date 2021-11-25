@@ -78,6 +78,20 @@ def test(args):
     TR.process([loss, acc, auc, pr], cls_metrics)
 
 
+class AutoTester:
+    def __init__(self, data_path, label_path, phase):
+        self.data_path = data_path
+        self.label_path = label_path
+        self.phase = phase
+
+    def run(self, model_path, backbone):
+        import os
+        cmd = "python test.py --model_path {} --data_path {} --backbone {} --phase {} --auto".format(
+            model_path, self.data_path, backbone, self.phase
+        )
+        os.system(cmd)
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
