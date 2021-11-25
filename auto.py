@@ -18,10 +18,8 @@ class AutoProcessor:
         self.model_folder = model_folder
         self.output_folder = output_folder
         os.makedirs(self.output_folder, exist_ok=True)
-        if kw:
-            self.model_ls, self.option_ls = init_model_list_with_kw(model_folder, kw)
-        else:
-            self.model_ls, self.option_ls = init_model_list(model_folder)
+        self.model_ls, self.option_ls = init_model_list_with_kw(model_folder, kw) if kw \
+            else init_model_list(model_folder)
         self.display_interval = display_interval
         self.processor = {key: process_mapping[key](*value) for key, value in process_args.items()}
 
