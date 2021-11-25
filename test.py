@@ -81,13 +81,13 @@ def test(args):
 class AutoTester:
     def __init__(self, data_path, label_path, phase):
         self.data_path = data_path
-        self.label_path = label_path
+        self.label_path = label_path if label_path else "''"
         self.phase = phase
 
     def run(self, model_path, backbone):
         import os
-        cmd = "python test.py --model_path {} --data_path {} --backbone {} --phase {} --auto".format(
-            model_path, self.data_path, backbone, self.phase
+        cmd = "python test.py --model_path {} --data_path {} --label_path {} --backbone {} --phase {} --auto".format(
+            model_path, self.data_path, self.label_path, backbone, self.phase
         )
         os.system(cmd)
 
