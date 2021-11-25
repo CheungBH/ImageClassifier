@@ -87,6 +87,6 @@ class ErrorAnalyserRecorder:
                                       "error_analyse_{}".format(self.metric_names[idx]))
             logger.write([self.model_name] + self.records[idx])
         if not self.auto:
-            loggers_name = [os.path.join(self.folder, "error_analyse_{}".format(metric)) for metric in
+            loggers_name = [os.path.join(self.folder, "error_analyse_{}.csv".format(metric)) for metric in
                             self.metric_names]
             merge_csv(loggers_name, os.path.join(self.folder, "error_analyse.csv"))
