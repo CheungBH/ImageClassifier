@@ -118,7 +118,6 @@ class AutoDemo:
               "--show_ratio 0 --visualize".format(
             model_path, self.input_src, out_folder, self.label_path, backbone
         )
-        print(cmd)
         os.system(cmd)
 
 

@@ -47,8 +47,8 @@ if __name__ == '__main__':
     out_folder = model_folder + "_result" if not out_folder else out_folder
     kws = ()
     args = {
-        # "test": ["/home/hkuit155/Desktop/CNN_classification/data/CatDog", "", "val"],
-        # "demo": ["data/cat_dog_test", out_folder, "config/labels/cat_dog.txt"],
+        "test": ["/home/hkuit155/Desktop/CNN_classification/data/CatDog", "", "val"],
+        "demo": ["data/cat_dog_test", out_folder, "config/labels/cat_dog.txt"],
         "convert": [out_folder]
     }
     AP = AutoProcessor(model_folder, args, out_folder, kws)

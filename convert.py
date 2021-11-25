@@ -37,7 +37,7 @@ def convert(args):
 
 class AutoConvert:
     def __init__(self, output_folder):
-        self.output_folder = output_folder
+        self.output_folder = os.path.join(output_folder, "convert")
 
     def run(self, model_path, args):
         num_cls, inp_size, backbone = args
