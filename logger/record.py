@@ -68,11 +68,12 @@ class TestRecorder:
 
 
 class ErrorAnalyserRecorder:
-    def __init__(self, folder, metric_names=(), auto=False):
+    def __init__(self, model_name, metric_names=(), auto=False):
         self.metric_names = metric_names
         self.name = []
         self.records = [[] for _ in range(len(self.metric_names))]
-        self.folder = "/".join(folder.split("/")[:-2])
+        self.folder = "/".join(model_name.split("/")[:-2])
+        self.model_name = model_name
         self.auto = auto
 
     def update(self, name, metrics):
@@ -84,6 +85,6 @@ class ErrorAnalyserRecorder:
         for idx in range(len(self.metric_names)):
             logger = CustomizedLogger(self.folder, "model_name," + list2str(self.name)+"\n",
                                       "error_analysis_{}".format(self.metric_names[idx]))
-            logger.write(self.records[idx])
+            logger.write([self.model_name] + self.records[idx])
         # if not self.auto:
 
