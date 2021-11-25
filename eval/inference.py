@@ -6,14 +6,10 @@ import config.config as config
 import random
 import torch
 
-label_path = config.label_path
-model_path = config.model_path
-backbone = config.backbone
-visualize = config.visualize
-
 
 class ModelInference:
-    def __init__(self):
+    def __init__(self, model_path=config.model_path, label_path=config.label_path, backbone=config.backbone,
+                 visualize=config.visualize):
         self.backbone = backbone if backbone else get_pretrain(model_path)
         self.model_size = 224
         self.classes = read_labels(label_path)

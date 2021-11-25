@@ -13,10 +13,11 @@ fps = 12
 
 class Demo:
     def __init__(self, args):
-        self.MI = ModelInference()
+        self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=args.backbone,
+                 visualize=args.visualize)
         self.input = args.input_src
         self.output = args.output_src
-        self.show = args.show
+        self.show = True if args.show_ratio else False
         self.show_ratio = args.show_ratio
         self.save_ratio = args.save_ratio
 
@@ -26,7 +27,7 @@ class Demo:
             if self.output:
                 assert os.path.isdir(self.output), "The output should be a folder when the input is a folder!"
                 os.makedirs(self.output, exist_ok=True)
-                self.output_imgs = [os.path.join(self.output, file_name) for file_name in os.listdir(self.output)]
+                self.output_imgs = [os.path.join(self.output, file_name) for file_name in os.listdir(self.input)]
         elif isinstance(self.input, int):
             self.demo_type = "video"
             self.cap = cv2.VideoCapture(self.input)
@@ -103,14 +104,37 @@ class Demo:
             raise ValueError
 
 
+class AutoDemo:
+    def __init__(self, input_src, out_src, label_path):
+        self.input_src = input_src
+        self.label_path = label_path
+        self.out_src = os.path.join(out_src, "demo")
+
+    def run(self, model_path, backbone):
+        import os
+        out_folder = os.path.join(self.out_src, model_path.split("/")[-2])
+        os.makedirs(out_folder, exist_ok=True)
+        cmd = "python demo.py --model_path {} --input_src {} --output_src {} --label_path {} --backbone {} " \
+              "--show_ratio 0 --visualize".format(
+            model_path, self.input_src, out_folder, self.label_path, backbone
+        )
+        print(cmd)
+        os.system(cmd)
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_src', help="", required=True)
+    parser.add_argument('--model_path', required=True)
+    parser.add_argument('--label_path', default="", required=True)
+
     parser.add_argument('--output_src', help="")
-    parser.add_argument('--show', action="store_true")
     parser.add_argument('--save_ratio', default=1, type=float)
     parser.add_argument('--show_ratio', default=1, type=float)
+
+    parser.add_argument('--backbone', default="", type=str)
+    parser.add_argument('--visualize', action="store_true")
     args = parser.parse_args()
     demo = Demo(args)
     demo.run()
