@@ -84,7 +84,7 @@ class ErrorAnalyserRecorder:
     def release(self):
         for idx in range(len(self.metric_names)):
             logger = CustomizedLogger(self.folder, "model_name," + list2str(self.name)+"\n",
-                                      "error_analysis_{}".format(self.metric_names[idx]))
+                                      "error_analyse_{}".format(self.metric_names[idx]))
             logger.write([self.model_name] + self.records[idx])
         # if not self.auto:
 
