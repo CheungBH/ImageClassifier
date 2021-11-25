@@ -59,6 +59,13 @@ def init_model_list(folder):
     return models, options
 
 
-def get_backbone(option_file):
+def get_runtime_params(process_type, option_file):
     import torch
-    return torch.load(option_file).backbone
+    opt = torch.load(option_file)
+    if process_type == "test" or process_type == "demo":
+        return opt.backbone
+    elif process_type == "convert":
+        backbone = opt.backbone
+        num_cls = opt.cls_num
+        inp_size = 299 if backbone == "inception" else 224
+        return num_cls, inp_size, backbone
