@@ -90,3 +90,6 @@ class ErrorAnalyserRecorder:
             loggers_name = [os.path.join(self.folder, "error_analyse_{}.csv".format(metric)) for metric in
                             self.metric_names]
             merge_csv(loggers_name, os.path.join(self.folder, "error_analyse.csv"))
+            convert_csv(os.path.join(self.folder, "error_analyse.csv"))
+            for logger in loggers_name:
+                os.system("rm {}".format(logger))
