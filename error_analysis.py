@@ -65,7 +65,7 @@ def error_analyse(args):
                 loss = criterion(outputs, labels)
 
         loader_desc.set_description("Error analysing")
-        EAR.update(names[0], (loss.tolist(), int(torch.max(outputs, 1) == labels)))
+        EAR.update(names[0].split("/")[-1], (loss.tolist(), int(torch.max(outputs, 1)[1] == labels)))
     EAR.release()
 
 
