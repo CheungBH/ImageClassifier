@@ -47,7 +47,7 @@ def error_analyse(args):
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
-    EAR = ErrorAnalyserRecorder(model_path, metric_names)
+    EAR = ErrorAnalyserRecorder(model_path, metric_names, args.auto)
 
     for i, (names, inputs, labels) in enumerate(loader_desc):
         inputs = inputs.to(device)
@@ -92,6 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('--backbone', default="")
     parser.add_argument('--phase', default="val")
     parser.add_argument('--num_worker', default=1, type=int)
+    parser.add_argument('--auto', action="store_true")
     args = parser.parse_args()
 
     error_analyse(args)

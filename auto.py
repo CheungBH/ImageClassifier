@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 
-from utils.utils import init_model_list_with_kw, init_model_list, get_runtime_params
+from utils.utils import init_model_list_with_kw, init_model_list, get_runtime_params, convert_csv
 import shutil, os
 from test import AutoTester
 from demo import AutoDemo
@@ -38,6 +38,8 @@ class AutoProcessor:
                 for excel_path in excel_paths:
                     shutil.move(os.path.join(self.model_folder, excel_path),
                                 os.path.join(self.output_folder, excel_path))
+                    if process_type == "error_analyse":
+                        convert_csv(os.path.join(self.output_folder, excel_path))
 
 
 if __name__ == '__main__':
@@ -50,7 +52,7 @@ if __name__ == '__main__':
         "test": ["/home/hkuit155/Desktop/CNN_classification/data/CatDog", "", "val"],
         "demo": ["data/cat_dog_test", out_folder, "config/labels/cat_dog.txt"],
         "convert": [out_folder],
-        "error_analyser": ["/home/hkuit155/Desktop/CNN_classification/data/CatDog", "", "val"],
+        "error_analyse": ["/home/hkuit155/Desktop/CNN_classification/data/CatDog", "", "val"],
     }
     AP = AutoProcessor(model_folder, args, out_folder, kws)
     AP.process()
