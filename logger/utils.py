@@ -30,3 +30,14 @@ def print_final_result(best_recorder, metrics, phases=("train", "val")):
             else:
                 print("Best {} {}: {}".format(phase, metric, best_recorder[phase][idx]))
     print("-------------------------------")
+
+
+def list2str(ls):
+    tmp = ""
+    for item in ls:
+        if isinstance(item, str):
+            tmp += item
+        else:
+            tmp += str(round(item, 4))
+        tmp += ","
+    return tmp[:-1]

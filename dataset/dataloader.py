@@ -91,11 +91,11 @@ class DataLoader:
         assert self.phases, "Please assign your phases using the dataset!"
         self.build(data_dir, label_path, inp_size, batch_size, num_worker)
 
-    def build(self, data_dir, label_path="", inp_size=224, batch_size=32, num_worker=2):
+    def build(self, data_dir, label_path="", inp_size=224, batch_size=32, num_worker=2, shuffle=True):
         self.label = self.get_labels(data_dir, label_path)
         self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), self.label, size=inp_size) for x in self.phases}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
-                                                                shuffle=True, num_workers=num_worker)
+                                                                shuffle=shuffle, num_workers=num_worker)
                             for x in self.phases}
         self.cls_num = len(self.image_datasets[self.phases[0]].label)
 

@@ -5,6 +5,7 @@ from .log_manager import LoggerManager, TestLoggerManager
 from .graph import GraphSaver
 from .utils import *
 from .metric_manger import MetricManager
+from .logger import CustomizedLogger
 import os
 
 
@@ -64,3 +65,22 @@ class TestRecorder:
         print_final_result(metrics, self.metrics_name, phases=("test", ))
         if self.auto:
             self.logger.update(metrics, cls_metrics)
+
+
+class ErrorAnalyserRecorder:
+    def __init__(self, folder, metric_names=()):
+        self.metric_names = metric_names
+        self.name = []
+        self.records = [[] for _ in range(len(self.metric_names))]
+        self.folder = folder
+
+    def update(self, name, metrics):
+        self.name.append(name)
+        for idx in range(len(metrics)):
+            self.records[idx].append(metrics[idx])
+
+    def release(self):
+        for idx in range(len(self.metric_names)):
+            logger = CustomizedLogger(self.folder, "model_name," + list2str(self.name),
+                                      "error_analysis_{}".format(self.metric_names[idx]))
+            logger.write(self.records[idx])
