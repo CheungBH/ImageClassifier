@@ -5,11 +5,13 @@ import shutil, os
 from test import AutoTester
 from demo import AutoDemo
 from convert import AutoConvert
+from error_analysis import AutoErrorAnalyser
 
 process_mapping = {
     "test": AutoTester,
     "demo": AutoDemo,
     "convert": AutoConvert,
+    "error_analyse": AutoErrorAnalyser
 }
 
 
@@ -31,9 +33,11 @@ class AutoProcessor:
                     print("-------------------[{}/{}]: {} for {}--------------".format(
                         idx+1, total_num, process_type, model))
                 processor.run(model, get_runtime_params(process_type, option))
-            if process_type == "test":
-                result_name = os.path.join("{}_result.csv".format(process_type))
-                shutil.move(os.path.join(self.model_folder, result_name), os.path.join(self.output_folder, result_name))
+            if process_type == "test" or process_type == "error_analyse":
+                excel_paths = [file for file in os.listdir(self.model_folder) if "{}".format(process_type) in file]
+                for excel_path in excel_paths:
+                    shutil.move(os.path.join(self.model_folder, excel_path),
+                                os.path.join(self.output_folder, excel_path))
 
 
 if __name__ == '__main__':
@@ -45,7 +49,8 @@ if __name__ == '__main__':
     args = {
         "test": ["/home/hkuit155/Desktop/CNN_classification/data/CatDog", "", "val"],
         "demo": ["data/cat_dog_test", out_folder, "config/labels/cat_dog.txt"],
-        "convert": [out_folder]
+        "convert": [out_folder],
+        "error_analyser": ["/home/hkuit155/Desktop/CNN_classification/data/CatDog", "", "val"],
     }
     AP = AutoProcessor(model_folder, args, out_folder, kws)
     AP.process()

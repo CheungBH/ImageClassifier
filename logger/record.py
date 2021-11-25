@@ -72,7 +72,7 @@ class ErrorAnalyserRecorder:
         self.metric_names = metric_names
         self.name = []
         self.records = [[] for _ in range(len(self.metric_names))]
-        self.folder = folder
+        self.folder = "/".join(folder.split("/")[:-2])
 
     def update(self, name, metrics):
         self.name.append(name)
@@ -81,6 +81,6 @@ class ErrorAnalyserRecorder:
 
     def release(self):
         for idx in range(len(self.metric_names)):
-            logger = CustomizedLogger(self.folder, "model_name," + list2str(self.name),
+            logger = CustomizedLogger(self.folder, "model_name," + list2str(self.name)+"\n",
                                       "error_analysis_{}".format(self.metric_names[idx]))
             logger.write(self.records[idx])

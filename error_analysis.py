@@ -47,7 +47,7 @@ def error_analyse(args):
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
-    EAR = ErrorAnalyserRecorder(args, metric_names)
+    EAR = ErrorAnalyserRecorder(model_path, metric_names)
 
     for i, (names, inputs, labels) in enumerate(loader_desc):
         inputs = inputs.to(device)
@@ -65,7 +65,7 @@ def error_analyse(args):
                 loss = criterion(outputs, labels)
 
         loader_desc.set_description("Error analysing")
-        EAR.update(names[0], (loss, int(torch.max(outputs, 1) == labels)))
+        EAR.update(names[0], (loss.tolist(), int(torch.max(outputs, 1) == labels)))
     EAR.release()
 
 
@@ -77,7 +77,7 @@ class AutoErrorAnalyser:
 
     def run(self, model_path, backbone):
         import os
-        cmd = "python error_analysis.py --model_path {} --data_path {} --label_path {} --backbone {} --phase {} --auto".format(
+        cmd = "python error_analysis.py --model_path {} --data_path {} --label_path {} --backbone {} --phase {}".format(
             model_path, self.data_path, self.label_path, backbone, self.phase
         )
         os.system(cmd)
