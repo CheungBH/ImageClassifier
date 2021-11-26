@@ -25,6 +25,7 @@ class Demo:
             self.demo_type = "image_folder"
             self.input_imgs = [os.path.join(self.input, file_name) for file_name in os.listdir(self.input)]
             if self.output:
+                os.makedirs(self.output, exist_ok=True)
                 assert os.path.isdir(self.output), "The output should be a folder when the input is a folder!"
                 os.makedirs(self.output, exist_ok=True)
                 self.output_imgs = [os.path.join(self.output, file_name) for file_name in os.listdir(self.input)]
