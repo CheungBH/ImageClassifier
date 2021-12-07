@@ -5,32 +5,25 @@ import torch
 try:
     from .utils import read_labels
     from .transform import Transform
+    from .adjust_trainval import SampleAdjuster
 except:
     from utils import read_labels
     from transform import Transform
-from collections import Counter
+    from adjust_trainval import SampleAdjuster
 
 
 class ClassifyDataset:
     def __init__(self, img_path, label_cls, args):
-        img_dir_name, img_dir_label, self.img_name, self.img_label = [], [], [], []
-        self.label = []
-        image_label_dict = label_cls
+        self.img_name, self.img_label = [], []
+        self.label = label_cls
+        self.label_nums = len(self.label)
         self.transform = Transform()
         self.transform.init_with_args(args)
 
-        for idx, cls in enumerate(image_label_dict):
-            self.label.append(cls)
-            img_dir_name.append(os.path.join(img_path, cls))
-            img_dir_label.append(idx)
-
-        for dir_name, dir_label in zip(img_dir_name, img_dir_label):
-            img_file_names = os.listdir(os.path.join(dir_name))
-            for img_name in img_file_names:
-                self.img_name.append(os.path.join(dir_name, img_name))
-                self.img_label.append(dir_label)
-
-        self.label_nums = Counter(self.img_label)
+        for idx, cls in enumerate(label_cls):
+            for file in os.listdir(os.path.join(img_path, cls)):
+                self.img_name.append(os.path.join(img_path, cls, file))
+                self.img_label.append(idx)
 
     def __len__(self):
         return len(self.img_name)
@@ -53,10 +46,10 @@ class DataLoader:
         batch_size = args.batch_size
         num_worker = args.num_worker
 
-        if adjust_ratio > 0 and self.phases is ("train", "val"):
-            ImgAdjuster(adjust_ratio, data_dir).run()
         assert self.phases, "Please assign your phases using the dataset!"
         self.build(data_dir, label_path, inp_size, batch_size, num_worker)
+        if adjust_ratio > 0 and self.phases is ("train", "val"):
+            SampleAdjuster(data_dir, adjust_ratio).adjust_loader(self.dataloaders_dict)
 
     def build(self, data_dir, label_path="", inp_size=224, batch_size=32, num_worker=2, shuffle=True):
         self.label = self.get_labels(data_dir, label_path)
