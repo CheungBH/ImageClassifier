@@ -78,7 +78,8 @@ class DataLoader:
 if __name__ == '__main__':
     data_dir = "/home/hkuit155/Desktop/CNN_classification/data/CatDog"
     loader = DataLoader()
-    loader.build(data_dir)
+    from config.train_args import args
+    loader.build_with_args(args)
     vis_phase = "val"
     for idx, (name, inps, labels) in enumerate(loader.dataloaders_dict[vis_phase]):
         print(name)
