@@ -48,7 +48,10 @@ def train(args):
 
     MB = ModelBuilder()
     model = MB.build_with_args(args)
-    (args.flops, args.params, args.inf_time) = MB.get_benchmark(inp_size)
+    if args.backbone != "vit":
+        (args.flops, args.params, args.inf_time) = MB.get_benchmark(inp_size)
+    else:
+        (args.flops, args.params, args.inf_time) = 0, 0, 0
 
     criterion = CriteriaInitializer().get(args)
     optimizer = OptimizerInitializer().get(args, MB.params_to_update)

@@ -65,7 +65,7 @@ class ConvNet(nn.Module):
 
 
 class CNNModel(object):
-    def __init__(self, num_classes, model_name, load_pretrain=True, cfg=None):
+    def __init__(self, num_classes, model_name, load_pretrain=True, inp_size=224):
         if model_name == "inception":
             self.model = models.inception_v3()
             if load_pretrain:
@@ -135,6 +135,19 @@ class CNNModel(object):
                 self.model.load_state_dict(torch.load("weights/pretrain/%s.pth" % model_name), map_location=device)
             self.model.classifier = nn.Sequential(nn.Dropout(p=0.2, inplace=True),
                                                   nn.Linear(1280, num_classes))
+        elif model_name == "vit":
+            from .vit import ViT
+            self.model = ViT(
+                image_size=inp_size,
+                patch_size=4,
+                num_classes=num_classes,
+                dim=512,                  # 512
+                depth=6,
+                heads=8,
+                mlp_dim=512,
+                dropout=0.1,
+                emb_dropout=0.1
+            )
         else:
             raise ValueError("Your pretrain model name is wrong!")
 
