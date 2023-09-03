@@ -8,8 +8,9 @@ from collections import Counter
 
 
 class ClassifyDataset(Dataset):
-    def __init__(self, img_path, label_cls, image_processor=image_normalize, size=224):
+    def __init__(self, img_path, label_cls, image_processor=image_normalize, size=224, data_percentage=1):
         img_dir_name, img_dir_label, self.img_name, self.img_label = [], [], [], []
+        self.data_percentage = data_percentage
         self.size = size
         self.label = []
         image_label_dict = label_cls
@@ -22,7 +23,9 @@ class ClassifyDataset(Dataset):
 
         for dir_name, dir_label in zip(img_dir_name, img_dir_label):
             img_file_names = os.listdir(os.path.join(dir_name))
-            for img_name in img_file_names:
+            for idx, img_name in enumerate(img_file_names):
+                if (idx * self.data_percentage) % 1 != 0:
+                    continue
                 self.img_name.append(os.path.join(dir_name, img_name))
                 self.img_label.append(dir_label)
 
@@ -80,6 +83,7 @@ class DataLoader:
         self.phases = phases
 
     def build_with_args(self, args, inp_size=224):
+        data_percentage = args.data_percentage
         adjust_ratio = args.trainval_ratio
         data_dir = args.data_path
         label_path = args.label_path
@@ -89,11 +93,11 @@ class DataLoader:
         if adjust_ratio > 0 and self.phases is ("train", "val"):
             ImgAdjuster(adjust_ratio, data_dir).run()
         assert self.phases, "Please assign your phases using the dataset!"
-        self.build(data_dir, label_path, inp_size, batch_size, num_worker)
+        self.build(data_dir, label_path, inp_size, batch_size, num_worker, data_percentage=data_percentage)
 
-    def build(self, data_dir, label_path="", inp_size=224, batch_size=32, num_worker=2, shuffle=True):
+    def build(self, data_dir, label_path="", inp_size=224, batch_size=32, num_worker=2, shuffle=True, **kwargs):
         self.label = self.get_labels(data_dir, label_path)
-        self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), self.label, size=inp_size) for x in self.phases}
+        self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), self.label, size=inp_size, **kwargs) for x in self.phases}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
                                                                 shuffle=shuffle, num_workers=num_worker)
                             for x in self.phases}

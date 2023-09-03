@@ -4,7 +4,7 @@ import time
 import torch
 import torchvision
 from torch.autograd import Variable
-from config.config import device
+# from config.config import device
 
 
 def print_model_param_nums(model, multiply_adds=True):
@@ -12,7 +12,7 @@ def print_model_param_nums(model, multiply_adds=True):
     return total
 
 
-def print_model_param_flops(model=None, input_height=224, input_width=224, multiply_adds=True):
+def print_model_param_flops(model=None, input_height=224, input_width=224, multiply_adds=True, device="cuda:0"):
     prods = {}
 
     def save_hook(name):
@@ -125,7 +125,7 @@ def print_model_param_flops(model=None, input_height=224, input_width=224, multi
     return total_flops / 3
 
 
-def get_inference_time(model, repeat=190, height=416, width=416):
+def get_inference_time(model, repeat=190, height=416, width=416, device="cuda:0"):
     model.eval()
     start = time.time()
     with torch.no_grad():

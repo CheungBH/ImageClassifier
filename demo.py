@@ -14,7 +14,7 @@ fps = 12
 class Demo:
     def __init__(self, args):
         self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=args.backbone,
-                 visualize=args.visualize)
+                 visualize=args.visualize, device=args.device)
         self.input = args.input_src
         self.output = args.output_src
         self.show = True if args.show_ratio else False
@@ -128,6 +128,7 @@ if __name__ == '__main__':
     parser.add_argument('--input_src', help="", required=True)
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--label_path', default="", required=True)
+    parser.add_argument('--device', default="cuda:0")
 
     parser.add_argument('--output_src', help="")
     parser.add_argument('--save_ratio', default=1, type=float)

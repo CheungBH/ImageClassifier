@@ -63,6 +63,7 @@ def train(args):
     if mix_precision:
         m, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 
+
     for epoch in range(epochs)[args.start_epoch:]:
         for phase in ["train", "val"]:
             EpochEval = EpochEvaluator(data_loader.cls_num)

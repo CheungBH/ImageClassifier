@@ -8,6 +8,7 @@ from torch import nn
 
 MIN_NUM_PATCHES = 16
 
+
 class channel_selection(nn.Module):
     def __init__(self, num_channels):
         """
@@ -184,12 +185,14 @@ class ViT(nn.Module):
         x = self.to_cls_token(x[:, 0])
         return self.mlp_head(x)
 
+
 def setup_seed(seed):
     torch.manual_seed(seed)
     # torch.cuda.manual_seed_all(seed)
     # np.random.seed(seed)
     # random.seed(seed)
     torch.backends.cudnn.deterministic = True
+
 
 if __name__ == "__main__":
     # setup_seed(200)

@@ -14,12 +14,13 @@ freeze_pretrain = {"mobilenet": [155, "classifier"],
 
 
 class ModelBuilder:
-    def __init__(self, pretrain=False, device="cuda:0"):
+    def __init__(self, pretrain=False):
         self.pretrain = pretrain
-        self.device = device
+        # self.device = device
 
-    def build(self, cls_num, backbone):
-        self.CNN = CNNModel(cls_num, backbone, load_pretrain=self.pretrain)
+    def build(self, cls_num, backbone, device):
+        self.device = device
+        self.CNN = CNNModel(cls_num, backbone, load_pretrain=self.pretrain, device=self.device)
         if self.device != "cpu":
             self.CNN.model.cuda()
         self.params_to_update = self.CNN.model.parameters()
@@ -30,6 +31,7 @@ class ModelBuilder:
         self.CNN.load(path)
     
     def build_with_args(self, args):
+        self.device = args.device
         self.backbone = args.backbone
         self.cls_num = args.cls_num
         self.device = args.device
@@ -48,7 +50,7 @@ class ModelBuilder:
     def inference(self, img_tns):
         img_tensor_list = [torch.unsqueeze(img_tns, 0)]
         input_tensor = torch.cat(tuple(img_tensor_list), dim=0)
-        self.image_batch_tensor = input_tensor.cuda()
+        self.image_batch_tensor = input_tensor.cuda() if self.device != "cpu" else input_tensor
         outputs = self.CNN.model(self.image_batch_tensor)
         outputs_tensor = outputs.data
         m_softmax = nn.Softmax(dim=1)

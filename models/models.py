@@ -5,9 +5,9 @@ import torchvision.models as models
 from torch.nn import functional as F
 import torch
 from .benchmark import print_model_param_flops, print_model_param_nums, get_inference_time
+# from config.config import device
 
 
-device = "cuda:0"
 
 class LeNet(nn.Module):
     def __init__(self, num_class):
@@ -32,7 +32,7 @@ class LeNet(nn.Module):
         return x
 
     def num_flat_features(self, x):
-        size = x.size()[1:]  # x.size返回的是一个元组，size表示截取元组中第二个开始的数字
+        size = x.size()[1:]
         num_features = 1
         for s in size:
             num_features *= s
@@ -65,7 +65,8 @@ class ConvNet(nn.Module):
 
 
 class CNNModel(object):
-    def __init__(self, num_classes, model_name, load_pretrain=True, inp_size=224):
+    def __init__(self, num_classes, model_name, load_pretrain=True, inp_size=224, device="cuda:0"):
+        self.device = device
         if model_name == "inception":
             self.model = models.inception_v3()
             if load_pretrain:
@@ -152,12 +153,12 @@ class CNNModel(object):
             raise ValueError("Your pretrain model name is wrong!")
 
     def load(self, weight_path):
-        self.model.load_state_dict(torch.load(weight_path, map_location=device))
+        self.model.load_state_dict(torch.load(weight_path, map_location=self.device))
 
     def get_benchmark(self, input_size=224):
-        flops = print_model_param_flops(self.model)
+        flops = print_model_param_flops(self.model, device=self.device)
         params = print_model_param_nums(self.model)
-        inf_time = get_inference_time(self.model, height=input_size, width=input_size)
+        inf_time = get_inference_time(self.model, height=input_size, width=input_size, device=self.device)
         return flops, params, inf_time
 
 

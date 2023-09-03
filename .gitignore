@@ -66,6 +66,7 @@ src/tv
 *.onnx
 *.pt
 error.txt
-*/config.py
+*.DS_Store
+exp/
 cmd.py
 weights/*
