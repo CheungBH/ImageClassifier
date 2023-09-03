@@ -128,13 +128,12 @@ if __name__ == '__main__':
     parser.add_argument('--input_src', help="", required=True)
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--label_path', default="", required=True)
+    parser.add_argument('--backbone', default="mobilenet")
     parser.add_argument('--device', default="cuda:0")
-
     parser.add_argument('--output_src', help="")
+
     parser.add_argument('--save_ratio', default=1, type=float)
     parser.add_argument('--show_ratio', default=1, type=float)
-
-    parser.add_argument('--backbone', default="", type=str)
     parser.add_argument('--visualize', action="store_true")
     args = parser.parse_args()
     demo = Demo(args)

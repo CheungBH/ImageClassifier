@@ -98,7 +98,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--data_path', required=True)
-    parser.add_argument('--backbone', default="")
+    parser.add_argument('--backbone', default="mobilenet")
     parser.add_argument('--phase', default="val")
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--num_worker', default=0, type=int)

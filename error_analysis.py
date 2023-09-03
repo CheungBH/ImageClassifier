@@ -19,8 +19,7 @@ metric_names = config.error_analysis_metrics
 
 
 def error_analyse(args):
-    device = "cuda:0"
-
+    device = args.device
     model_path = args.model_path
     data_path = args.data_path
     label_path = args.label_path
@@ -41,7 +40,7 @@ def error_analyse(args):
     criterion = nn.CrossEntropyLoss()
 
     MB = ModelBuilder()
-    model = MB.build(data_loader.cls_num, backbone)
+    model = MB.build(data_loader.cls_num, backbone, device)
     MB.load_weight(model_path)
 
     model.eval()
@@ -65,7 +64,8 @@ def error_analyse(args):
                 loss = criterion(outputs, labels)
 
         loader_desc.set_description("Error analysing")
-        EAR.update(names[0].split("/")[-1], (loss.tolist(), int(torch.max(outputs, 1)[1] == labels)))
+        EAR.update(names[0].split("/")[-1], (loss.tolist(), outputs.max().tolist(),
+                                             int(torch.max(outputs, 1)[1] == labels)))
     EAR.release()
 
 
@@ -89,10 +89,13 @@ if __name__ == '__main__':
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--data_path', required=True)
     parser.add_argument('--label_path', default="")
-    parser.add_argument('--backbone', default="")
+    parser.add_argument('--backbone', default="mobilenet")
     parser.add_argument('--phase', default="val")
-    parser.add_argument('--num_worker', default=1, type=int)
+    parser.add_argument('--logger_path', default="")
+
+    parser.add_argument('--num_worker', default=0, type=int)
     parser.add_argument('--auto', action="store_true")
+    parser.add_argument('--device', default="cuda:0")
     args = parser.parse_args()
 
     error_analyse(args)

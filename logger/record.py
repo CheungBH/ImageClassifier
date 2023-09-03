@@ -68,13 +68,15 @@ class TestRecorder:
 
 
 class ErrorAnalyserRecorder:
-    def __init__(self, model_name, metric_names=(), auto=False):
+    def __init__(self, model_name, metric_names=(), auto=False, phase="val", logger_path=""):
         self.metric_names = metric_names
+        self.phase = phase
         self.name = []
         self.auto = auto
         self.records = [[] for _ in range(len(self.metric_names))]
         self.folder = "/".join(model_name.split("/")[:-2]) if self.auto else "/".join(model_name.split("/")[:-1])
         self.model_name = model_name
+        self.logger_path = logger_path
 
     def update(self, name, metrics):
         self.name.append(name)
@@ -88,9 +90,11 @@ class ErrorAnalyserRecorder:
             logger.write([self.model_name] + self.records[idx]) if self.auto else logger.write([self.metric_names[idx]]
                                                                                                + self.records[idx])
         if not self.auto:
+            logger_path = os.path.join(self.folder, "{}_error_analyse.csv".format(self.phase)) \
+                if not self.logger_path else self.logger_path
             loggers_name = [os.path.join(self.folder, "error_analyse_{}.csv".format(metric)) for metric in
                             self.metric_names]
-            merge_csv(loggers_name, os.path.join(self.folder, "error_analyse.csv"))
-            convert_csv(os.path.join(self.folder, "error_analyse.csv"))
+            merge_csv(loggers_name, logger_path)
+            convert_csv(logger_path)
             for logger in loggers_name:
                 os.system("rm {}".format(logger))
