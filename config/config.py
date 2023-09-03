@@ -12,4 +12,4 @@ bad_epochs = {30: 0.1}
 patience_decay = {1: 0.5}
 
 
-error_analysis_metrics = ["loss", "possibility", "correct"]
+error_analysis_metrics = ["loss", "pred_conf", "label_conf", "correct"]

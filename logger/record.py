@@ -89,6 +89,7 @@ class ErrorAnalyserRecorder:
                                       "error_analyse_{}".format(self.metric_names[idx]))
             logger.write([self.model_name] + self.records[idx]) if self.auto else logger.write([self.metric_names[idx]]
                                                                                                + self.records[idx])
+            logger.file.close()
         if not self.auto:
             logger_path = os.path.join(self.folder, "{}_error_analyse.csv".format(self.phase)) \
                 if not self.logger_path else self.logger_path

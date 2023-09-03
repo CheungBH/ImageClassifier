@@ -35,7 +35,8 @@ def error_analyse(args):
         is_inception = True
 
     data_loader = DataLoader(phases=(phase,))
-    data_loader.build(data_path, label_path, inp_size, 1, num_worker, shuffle=False)
+    data_loader.build(data_path, label_path, inp_size, 1, num_worker, shuffle=False,
+                      data_percentage=args.data_percentage)
     args.labels = data_loader.label
     criterion = nn.CrossEntropyLoss()
 
@@ -46,7 +47,7 @@ def error_analyse(args):
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
-    EAR = ErrorAnalyserRecorder(model_path, metric_names, args.auto)
+    EAR = ErrorAnalyserRecorder(model_path, metric_names, args.auto, logger_path=args.logger_path)
 
     for i, (names, inputs, labels) in enumerate(loader_desc):
         inputs = inputs.to(device)
@@ -64,7 +65,7 @@ def error_analyse(args):
                 loss = criterion(outputs, labels)
 
         loader_desc.set_description("Error analysing")
-        EAR.update(names[0].split("/")[-1], (loss.tolist(), outputs.max().tolist(),
+        EAR.update(names[0].split("/")[-1], (loss.tolist(), outputs.max().tolist(), outputs[0][labels].tolist()[0],
                                              int(torch.max(outputs, 1)[1] == labels)))
     EAR.release()
 
@@ -92,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('--backbone', default="mobilenet")
     parser.add_argument('--phase', default="val")
     parser.add_argument('--logger_path', default="")
+    parser.add_argument('--data_percentage', '-dp', type=float, default=1)
 
     parser.add_argument('--num_worker', default=0, type=int)
     parser.add_argument('--auto', action="store_true")
