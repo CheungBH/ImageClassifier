@@ -18,7 +18,7 @@ def convert(args):
     inp_size = args.inp_size
 
     MB = ModelBuilder()
-    model = MB.build(num_cls, backbone)
+    model = MB.build(num_cls, backbone, "cpu")
     model.eval()
     MB.load_weight(model_path)
 
