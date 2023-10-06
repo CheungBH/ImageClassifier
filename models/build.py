@@ -35,7 +35,7 @@ class ModelBuilder:
         self.backbone = args.backbone
         self.cls_num = args.cls_num
         self.device = args.device
-        model = self.build(self.cls_num, self.backbone)
+        model = self.build(self.cls_num, self.backbone, self.device)
         if args.load_weight:
             self.load_weight(args.load_model)
         if args.freeze:
