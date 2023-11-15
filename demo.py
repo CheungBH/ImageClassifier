@@ -96,7 +96,7 @@ class Demo:
                 if self.show:
                     show_size = (int(self.show_ratio * frame.shape[1]), int(self.show_ratio * frame.shape[0]))
                     cv2.imshow("result", cv2.resize(frame, show_size))
-                    cv2.waitKey(1000)
+                    cv2.waitKey(1)
                 if self.output:
                     save_size = (int(self.save_ratio * frame.shape[1]), int(self.save_ratio * frame.shape[0]))
                     cv2.imwrite(self.output_imgs[idx], cv2.resize(frame, save_size))
