@@ -1,0 +1,4 @@
+{
+  "shape": "cv.MORPH_RECT",
+  "ksize": "(3, 3)"
+}
