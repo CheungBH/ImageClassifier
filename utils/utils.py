@@ -1,5 +1,12 @@
 #-*-coding:utf-8-*-
 import os
+import yaml
+
+
+def load_config(config_file):
+    with open(config_file, 'r') as config_file:
+        config = yaml.load(config_file, Loader=yaml.FullLoader)
+    return config
 
 
 def init_model_list_with_kw(folder, kws, fkws=""):

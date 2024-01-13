@@ -13,7 +13,7 @@ try:
     mix_precision = True
 except ImportError:
     mix_precision = False
-
+from utils.utils import load_config
 import config.config as config
 metric_names = config.metric_names
 cls_metric_names = config.cls_metric_names
@@ -24,21 +24,18 @@ def test(args):
 
     model_path = args.model_path
     data_path = args.data_path
-    # label_path = args.label_path
+    settings = load_config(args.cfg_path)
+
     batch_size = args.batch_size
     num_worker = args.num_worker
     phase = args.phase
-    backbone = args.backbone if args.backbone else get_pretrain(model_path)
+    backbone = settings["model"]["backbone"]
+    inp_size = settings["model"]["input_size"]
+    is_inception = False if backbone != "inception" else True
 
-    if backbone != "inception":
-        inp_size = 224
-        is_inception = False
-    else:
-        inp_size = 299
-        is_inception = True
 
     data_loader = DataLoader(phases=(phase,))
-    data_loader.build(data_path, "", inp_size, batch_size, num_worker)
+    data_loader.build(data_path, settings, "", batch_size, num_worker)
     args.labels = data_loader.label
 
     MB = ModelBuilder()
@@ -98,7 +95,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--data_path', required=True)
-    parser.add_argument('--backbone', default="mobilenet")
+    parser.add_argument('--cfg_path', default="config/model_cfg/mobilenet_all.yaml")
     parser.add_argument('--phase', default="val")
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--num_worker', default=0, type=int)
