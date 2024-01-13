@@ -17,6 +17,7 @@ class ClassifyDataset(Dataset):
         self.size = settings["model"]["input_size"]
         self.label = []
         self.is_train = is_train
+        self.init_augment(settings)
         image_label_dict = label_cls
         self.transforms = transforms.Compose([
             transforms.Resize((self.size, self.size)),

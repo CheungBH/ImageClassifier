@@ -8,6 +8,7 @@ from trainer.utils import resume
 from utils.utils import load_config
 from eval.evaluate import EpochEvaluator, BatchEvaluator
 from logger.record import TrainRecorder
+import shutil, os
 
 import torch
 from tqdm import tqdm
@@ -60,7 +61,7 @@ def train(args):
     if mix_precision:
         m, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 
-
+    shutil.copy(args.cfg_path, os.path.join(args.save_dir, "config.yaml"))
     for epoch in range(epochs)[args.start_epoch:]:
         for phase in ["train", "val"]:
             EpochEval = EpochEvaluator(data_loader.cls_num)
