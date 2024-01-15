@@ -8,9 +8,9 @@ import torch
 
 
 class ModelInference:
-    def __init__(self, model_path, label_path, backbone, visualize, device="cuda:0"):
+    def __init__(self, model_path, label_path, backbone, visualize, inp_size, device="cuda:0"):
         self.backbone = backbone if backbone else get_pretrain(model_path)
-        self.model_size = 224
+        self.model_size = inp_size
         self.classes = read_labels(label_path)
         self.MB = ModelBuilder()
         self.model = self.MB.build(len(self.classes), self.backbone, device)
@@ -20,7 +20,7 @@ class ModelInference:
         self.colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(len(self.classes))]
 
     def run(self, img, cnt=0):
-        img_tns = image_normalize(img, size=224)
+        img_tns = image_normalize(img, size=self.model_size)
         self.scores = self.MB.inference(img_tns)
         _, self.pred_idx = torch.max(self.scores, 1)
         self.pred_cls = self.classes[self.pred_idx]

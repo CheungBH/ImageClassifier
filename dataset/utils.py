@@ -29,8 +29,11 @@ def image_normalize(img_name, size=224):
 
 
 def read_labels(label_path):
-    with open(label_path, "r") as f:
-        return [item[:-1] for item in f.readlines()]
+    if not os.path.exists(label_path):
+        raise ValueError("Wrong label path")
+    else:
+        with open(label_path, "r") as f:
+            return [item[:-1] for item in f.readlines()]
 
 
 def image2tensorboard(img_name, size=224):

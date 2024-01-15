@@ -11,7 +11,7 @@ parser.add_argument('--rotate_angle', default=40, type=int)
 parser.add_argument('--data_percentage', '-dp', type=float, default=1)
 
 '''model configuration'''
-parser.add_argument('--backbone', default="mobilenet", type=str)
+parser.add_argument('--cfg_path', default="config/model_cfg/mobilenet_all.yaml", type=str)
 parser.add_argument('--freeze', default=0, type=int)
 
 '''train configuration'''

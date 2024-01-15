@@ -3,26 +3,28 @@
 from models.build import ModelBuilder
 import torch
 import os
+from utils.utils import load_config
 
 
 def convert(args):
     model_path = args.model_path
-    backbone = args.backbone
+    settings = load_config(args.cfg_path)
 
     libtorch_path = args.libtorch_path
     onnx_path = args.onnx_path
+    backbone = settings["model"]["backbone"]
 
     assert libtorch_path or onnx_path, "You should assign at least one type to convert!"
 
     num_cls = args.num_cls
-    inp_size = args.inp_size
+    inp_size = settings["model"]["input_size"]
 
     MB = ModelBuilder()
-    model = MB.build(num_cls, backbone)
+    model = MB.build(num_cls, backbone, "cpu")
     model.eval()
     MB.load_weight(model_path)
 
-    dummy_input = torch.rand(2, 3, inp_size, inp_size).cuda()
+    dummy_input = torch.rand(2, 3, inp_size, inp_size)
 
     with torch.no_grad():
         if onnx_path:
@@ -54,13 +56,13 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', required=True)
-    parser.add_argument('--backbone', required=True)
+    parser.add_argument('--cfg_path', required=True)
 
     parser.add_argument('--libtorch_path', default="", type=str)
     parser.add_argument('--onnx_path', default="", type=str)
 
     parser.add_argument('--num_cls', default=2, type=int)
-    parser.add_argument('--inp_size', default=224, type=int)
+    # parser.add_argument('--inp_size', default=224, type=int)
     args = parser.parse_args()
     convert(args)
 

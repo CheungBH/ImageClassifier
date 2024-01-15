@@ -15,6 +15,8 @@ except ImportError:
     mix_precision = False
 
 import config.config as config
+from utils.utils import load_config
+
 metric_names = config.error_analysis_metrics
 
 
@@ -25,17 +27,15 @@ def error_analyse(args):
     label_path = args.label_path
     num_worker = args.num_worker
     phase = args.phase
-    backbone = args.backbone if args.backbone else get_pretrain(model_path)
+    settings = load_config(args.cfg_path)
 
-    if backbone != "inception":
-        inp_size = 224
-        is_inception = False
-    else:
-        inp_size = 299
-        is_inception = True
+    backbone = settings["model"]["backbone"]
+    inp_size = settings["model"]["input_size"]
+    is_inception = False if backbone != "inception" else True
+
 
     data_loader = DataLoader(phases=(phase,))
-    data_loader.build(data_path, label_path, inp_size, 1, num_worker, shuffle=False,
+    data_loader.build(data_path, settings, label_path,1, num_worker, shuffle=False,
                       data_percentage=args.data_percentage)
     args.labels = data_loader.label
     criterion = nn.CrossEntropyLoss()
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--data_path', required=True)
     parser.add_argument('--label_path', default="")
-    parser.add_argument('--backbone', default="mobilenet")
+    parser.add_argument('--cfg_path', required=True)
     parser.add_argument('--phase', default="val")
     parser.add_argument('--logger_path', default="")
     parser.add_argument('--data_percentage', '-dp', type=float, default=1)

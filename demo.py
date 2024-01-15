@@ -4,6 +4,7 @@ from eval.inference import ModelInference
 import os
 import cv2
 import time
+from utils.utils import load_config
 
 image_ext = ["jpg", "jpeg", "webp", "bmp", "png"]
 video_ext = ["mp4", "mov", "avi", "mkv", "MP4"]
@@ -13,8 +14,12 @@ fps = 12
 
 class Demo:
     def __init__(self, args):
-        self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=args.backbone,
-                 visualize=args.visualize, device=args.device)
+        settings = load_config(args.cfg_path)
+        backbone = settings["model"]["backbone"]
+        inp_size = settings["model"]["input_size"]
+
+        self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=backbone,
+                 visualize=args.visualize, device=args.device, inp_size=inp_size)
         self.input = args.input_src
         self.output = args.output_src
         self.show = True if args.show_ratio else False
@@ -96,7 +101,7 @@ class Demo:
                 if self.show:
                     show_size = (int(self.show_ratio * frame.shape[1]), int(self.show_ratio * frame.shape[0]))
                     cv2.imshow("result", cv2.resize(frame, show_size))
-                    cv2.waitKey(1000)
+                    cv2.waitKey(1)
                 if self.output:
                     save_size = (int(self.save_ratio * frame.shape[1]), int(self.save_ratio * frame.shape[0]))
                     cv2.imwrite(self.output_imgs[idx], cv2.resize(frame, save_size))
@@ -125,10 +130,10 @@ class AutoDemo:
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_src', help="", required=True)
+    parser.add_argument('--input_src', help="Target input", required=True)
     parser.add_argument('--model_path', required=True)
-    parser.add_argument('--label_path', default="", required=True)
-    parser.add_argument('--backbone', default="mobilenet")
+    parser.add_argument('--label_path', required=True)
+    parser.add_argument('--cfg_path', required=True)
     parser.add_argument('--device', default="cuda:0")
     parser.add_argument('--output_src', help="")
 

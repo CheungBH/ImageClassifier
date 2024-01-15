@@ -5,8 +5,10 @@ from trainer.optimizer import OptimizerInitializer
 from trainer.scheduler import SchedulerInitializer
 from trainer.criterion import CriteriaInitializer
 from trainer.utils import resume
+from utils.utils import load_config
 from eval.evaluate import EpochEvaluator, BatchEvaluator
 from logger.record import TrainRecorder
+import shutil, os
 
 import torch
 from tqdm import tqdm
@@ -26,23 +28,19 @@ def train(args):
     if args.resume:
         args = resume(args)
 
-    device = args.device
+    settings = load_config(args.cfg_path)
 
+    device = args.device
     epochs = args.epochs
     sparse = args.sparse
-    backbone = args.backbone
-
-    if backbone != "inception":
-        inp_size = 224
-        is_inception = False
-    else:
-        inp_size = 299
-        is_inception = True
+    args.backbone = settings["model"]["backbone"]
+    inp_size = settings["model"]["input_size"]
+    is_inception = False if args.backbone != "inception" else True
 
     iterations = args.iteration
 
     data_loader = DataLoader()
-    data_loader.build_with_args(args, inp_size)
+    data_loader.build_with_args(args, settings)
     args.cls_num = data_loader.cls_num
     args.labels = data_loader.label
 
@@ -63,7 +61,7 @@ def train(args):
     if mix_precision:
         m, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 
-
+    shutil.copy(args.cfg_path, os.path.join(args.save_dir, "config.yaml"))
     for epoch in range(epochs)[args.start_epoch:]:
         for phase in ["train", "val"]:
             EpochEval = EpochEvaluator(data_loader.cls_num)

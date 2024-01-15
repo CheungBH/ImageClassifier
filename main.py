@@ -17,6 +17,7 @@ except ImportError:
     mix_precision = False
 
 import config.config as config
+from utils.utils import load_config
 metric_names = config.metric_names
 metric_directions = config.metric_directions
 cls_metric_names = config.cls_metric_names
@@ -25,19 +26,18 @@ cls_metric_names = config.cls_metric_names
 def main(args):
     if args.resume:
         args = resume(args)
+    settings = load_config(args.cfg_path)
 
     device = args.device
 
     epochs = args.epochs
     sparse = args.sparse
-    backbone = args.backbone
 
-    if backbone != "inception":
-        inp_size = 224
-        is_inception = False
-    else:
-        inp_size = 299
-        is_inception = True
+    backbone = settings["model"]["backbone"]
+    inp_size = settings["model"]["input_size"]
+    is_inception = False if backbone != "inception" else True
+
+
 
     iterations = args.iteration
 
