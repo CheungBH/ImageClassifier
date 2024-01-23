@@ -1,9 +1,9 @@
 #-*-coding:utf-8-*-
 
 from eval.inference import ModelInference
-import os
 import cv2
 import time
+from utils.utils import load_config
 
 image_ext = ["jpg", "jpeg", "webp", "bmp", "png"]
 video_ext = ["mp4", "mov", "avi", "mkv", "MP4"]
@@ -13,7 +13,8 @@ fps = 12
 
 class Demo:
     def __init__(self, args):
-        self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=args.backbone,
+        settings = load_config(args.cfg_path)
+        self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=settings["model"]["backbone"],
                  visualize=args.visualize, device=args.device)
         self.input = args.input_src
         self.output = args.output_src
@@ -65,7 +66,8 @@ if __name__ == '__main__':
     parser.add_argument('--input_src', help="", required=True)
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--label_path', default="", required=True)
-    parser.add_argument('--backbone', default="mobilenet")
+    # parser.add_argument('--backbone', default="mobilenet")
+    parser.add_argument('--cfg_path', default="config/model_cfg/mobilenet_all.yaml", type=str)
     parser.add_argument('--device', default="cuda:0")
     parser.add_argument('--output_src', help="")
 
