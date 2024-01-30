@@ -56,11 +56,11 @@ class Demo:
                     print("Processing time is {}".format(round(time.time() - time_begin), 4))
                     if self.show:
                         show_size = (int(self.show_ratio * frame.shape[1]), int(self.show_ratio * frame.shape[0]))
-                        cv2.imshow("result", cv2.resize(frame, show_size))
-                        cv2.imshow("input", cv2.resize(input_img, show_size))
+                        cv2.imshow("input", cv2.resize(frame, show_size))
+                        cv2.imshow("result", cv2.resize(input_img, show_size))
                         cv2.waitKey(1)
                     if self.output:
-                        self.out.write(cv2.resize(frame, self.save_size))
+                        self.out.write(cv2.resize(input_img, self.save_size))
                 else:
                     self.MI.release()
                     self.cap.release()
