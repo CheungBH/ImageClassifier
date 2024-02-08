@@ -4,6 +4,44 @@ import numpy as np
 import argparse
 import os
 import shutil
+from opencv_class import *
+
+
+
+class OpencvHandler:
+    def __init__(self, config_file):
+        with open(config_file, 'r') as ft:
+            cfg = json.load(ft)
+        self.type = cfg["type"]
+        if self.type == "bg":
+            self.cv_processor = BackgroundExtractor(config_file)
+        elif self.type == "optical_flow":
+            self.cv_processor = OpticalFlowProcessor(config_file)
+        elif self.type == "merge_channel":
+            self.cv_processor = MergeChannelProcessor(config_file)
+        else:
+            raise NotImplementedError
+
+    def process(self, video_input, video_output, view=False):
+        cap = cv.VideoCapture(video_input)
+        output_fps = cap.get(cv.CAP_PROP_FPS)
+        output_size = (int(cap.get(cv.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv.CAP_PROP_FRAME_HEIGHT)))
+        fourcc = cv.VideoWriter_fourcc(*'mp4v')
+        out = cv.VideoWriter(video_output, fourcc, output_fps, output_size, isColor=False)
+        while True:
+            ret, image = cap.read()
+            if ret is True:
+                processed_frame = self.cv_processor(image, view=view)
+                if view:
+                    cv.imshow("process_img", processed_frame)
+                out.write(processed_frame)
+
+                c = cv.waitKey(50)
+                if c == 27:
+                    break
+            else:
+                break
+
 
 bg_cfg = "cfg/bg_extract.json"
 OF_cfg_ft = "cfg/optical_flow_feature.json"
@@ -197,27 +235,38 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--raw_video_folder", type=str, help="Path to raw video folder")
     parser.add_argument("--output_video_folder", type=str, help="Path to generated video folder")
-    parser.add_argument("--bg_extract", action='store_true', help="Generate bg_extract videos")
-    parser.add_argument("--optical_flow", action='store_true', help="Generate optical_flow videos")
+    parser.add_argument("--cfg_folder", default="cfg_test", type=str, help="Path to config folder")
     parser.add_argument("--view_videos", action='store_true', help="View videos while generating")
 
-    parser.add_argument("--video_channel_merge", action='store_true', help="Combine 3 different video channels")
-
     opt = parser.parse_args()
-    input_video_paths = [os.path.join(opt.raw_video_folder, input_video_path) for input_video_path in os.listdir(opt.raw_video_folder)]
-    for input_video_path in input_video_paths:
-        video_name = os.path.basename(input_video_path)[:-4]
 
-        if opt.bg_extract:
-            output_video_path = f"{opt.output_video_folder}/{video_name}_bg.mp4"
-            bg_extract(input_video_path,  output_video_path, opt.view_videos)
-        if opt.optical_flow:
-            output_video_path = f"{opt.output_video_folder}/{video_name}_OF.mp4"
-            optical_flow(input_video_path, output_video_path, opt.view_videos)
-        if opt.video_channel_merge:
-            os.makedirs(os.path.join(opt.output_video_folder, "buffer"), exist_ok=True)
-            output_video_path = f"{opt.output_video_folder}/{video_name}_combined.mp4"
-            video_merge(input_video_path, f"{opt.output_video_folder}/buffer", output_video_path)
+    cfgs = [cfg_file for cfg_file in os.listdir(opt.cfg_folder) if ".DS_Store" not in cfg_file]
+    input_folders_path = [os.path.join(opt.raw_video_folder, input_video_path) for input_video_path in os.listdir(opt.raw_video_folder)]
+    for cfg in cfgs:
+        print("-------- Processing cfg {} ---------".format(cfg))
+        for input_folder_path in input_folders_path:
+            print("-------- Processing folder {} ---------".format(input_folder_path))
+            input_video_paths = [os.path.join(input_folder_path, input_video_path) for input_video_path in os.listdir(input_folder_path)]
+            for video_idx, input_video_path in enumerate(input_video_paths):
+                if video_idx % 20 == 0:
+                    print("Finish processing video {}".format(video_idx))
+                video_name = os.path.basename(input_video_path)[:-4]
+                cv_name = cfg.split(".")[0]
+                output_video_path = f"{opt.output_video_folder}/{video_name}_{cv_name}.mp4"
+                handler = OpencvHandler(os.path.join(opt.cfg_folder, cfg))
+                handler.process(input_video_path, output_video_path, opt.view_videos)
+
+
+                # if opt.bg_extract:
+                # output_video_path = f"{opt.output_video_folder}/{video_name}_bg.mp4"
+                # bg_extract(input_video_path,  output_video_path, opt.view_videos)
+                # if opt.optical_flow:
+                # output_video_path = f"{opt.output_video_folder}/{video_name}_OF.mp4"
+                # optical_flow(input_video_path, output_video_path, opt.view_videos)
+                # if opt.video_channel_merge:
+                # os.makedirs(os.path.join(opt.output_video_folder, "buffer"), exist_ok=True)
+                # output_video_path = f"{opt.output_video_folder}/{video_name}_combined.mp4"
+                # video_merge(input_video_path, f"{opt.output_video_folder}/buffer", output_video_path)
 
 
 if __name__ == "__main__":

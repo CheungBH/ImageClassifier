@@ -46,7 +46,6 @@ test/data/legacy_serialized.pt
 saved
 data
 test
-*/**/__init__.py
 */*.pth
 */*.onnx
 SPPE

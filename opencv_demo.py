@@ -5,6 +5,9 @@ import cv2
 import time
 from utils.utils import load_config
 import numpy as np
+import json
+from opencv_lib.opencv_class import *
+
 
 image_ext = ["jpg", "jpeg", "webp", "bmp", "png"]
 video_ext = ["mp4", "mov", "avi", "mkv", "MP4"]
@@ -13,7 +16,7 @@ fps = 12
 
 
 class Demo:
-    def __init__(self, args):
+    def __init__(self, args,):
         settings = load_config(args.cfg_path)
         self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=settings["model"]["backbone"], inp_size=settings["model"]["input_size"],
                  visualize=args.visualize, device=args.device)
@@ -22,25 +25,53 @@ class Demo:
         self.show = True if args.show_ratio else False
         self.show_ratio = args.show_ratio
         self.save_ratio = args.save_ratio
-        self.mog = cv2.createBackgroundSubtractorMOG2()
-        self.se = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        self.visualize = args.visualize
 
-        self.track_len = 15
-        self.detect_interval = 5
-        self.feature_params = dict(maxCorners=100, qualityLevel=0.1, minDistance=7, blockSize=7)
-        self.lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.02))
+        opencv_config_path = args.opencv_cfg
+        with open(opencv_config_path, 'r') as ft:
+            cfg = json.load(ft)
+        self.type = cfg["type"]
+        if self.type == "bg":
+            self.cv_processor = BackgroundExtractor(opencv_config_path)
+        elif self.type == "optical_flow":
+            self.cv_processor = OpticalFlowProcessor(opencv_config_path)
+        elif self.type == "merge_channel":
+            self.cv_processor = MergeChannelProcessor(opencv_config_path)
+        else:
+            raise NotImplementedError
 
         self.cap = cv2.VideoCapture(self.input)
         if self.output:
             out_ext = self.output.split(".")[-1]
             assert out_ext in video_ext, "The output should be a video when the input is webcam!"
             self.save_size = (int(self.save_ratio * self.cap.get(3)), int(self.save_ratio * self.cap.get(4)))
-            if args.opencv_mode == "bg":
-                self.out = cv2.VideoWriter(self.output, fourcc, fps, self.save_size)
-            else:
-                self.out = cv2.VideoWriter(self.output, fourcc, fps, self.save_size, True)
+            self.out = cv2.VideoWriter(self.output, fourcc, fps, self.save_size)
 
     def run(self):
+        cap = cv2.VideoCapture(self.input)
+        output_fps = cap.get(cv2.CAP_PROP_FPS)
+        output_size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        if self.output:
+            out = cv2.VideoWriter(self.output, fourcc, output_fps, output_size, isColor=False)
+        while True:
+            ret, image = cap.read()
+            if ret is True:
+                processed_frame = self.cv_processor(image)
+                if self.visualize:
+                    cv2.imshow("process_img", processed_frame)
+                    c = cv2.waitKey(1)
+                if self.output:
+                    out.write(processed_frame)
+                if c == 27:
+                    break
+            else:
+                self.MI.release()
+                cap.release()
+                if self.output:
+                    out.release()
+                break
+
         if args.opencv_mode == "bg":
             idx = 0
             while True:
@@ -132,11 +163,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_src', help="raw video", required=True)
     parser.add_argument('--model_path', required=True)
-    parser.add_argument('--label_path', default="", required=True)
-    # parser.add_argument('--backbone', default="mobilenet")
-    parser.add_argument('--opencv_mode', default="bg", help="OF or bg", required=True)
+    parser.add_argument('--model_cfg', default="config/model_cfg/mobilenet_all.yaml", type=str)
 
-    parser.add_argument('--cfg_path', default="config/model_cfg/mobilenet_all.yaml", type=str)
+    parser.add_argument('--label_path', required=True)
+    parser.add_argument('--opencv_cfg', required=True)
+
     parser.add_argument('--device', default="cuda:0")
     parser.add_argument('--output_src', help="")
 

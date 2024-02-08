@@ -1,0 +1,7 @@
+{
+  "type": "merge_channel",
+  "sequence": ["raw", "bg", "optical"],
+  "files":[
+    "", "bg_extract.json", "optical_flow.json"
+  ]
+}
