@@ -9,10 +9,11 @@ from opencv_class import *
 
 
 class OpencvHandler:
-    def __init__(self, config_file):
+    def __init__(self, config_file, delay=0):
         with open(config_file, 'r') as ft:
             cfg = json.load(ft)
         self.type = cfg["type"]
+        self.delay = delay
         if self.type == "bg":
             self.cv_processor = BackgroundExtractor(config_file)
         elif self.type == "optical_flow":
@@ -28,8 +29,12 @@ class OpencvHandler:
         output_size = (int(cap.get(cv.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv.CAP_PROP_FRAME_HEIGHT)))
         fourcc = cv.VideoWriter_fourcc(*'mp4v')
         out = cv.VideoWriter(video_output, fourcc, output_fps, output_size, isColor=False)
+        frame_idx = 0
+
         while True:
             ret, image = cap.read()
+            if frame_idx < self.delay:
+                continue
             if ret is True:
                 processed_frame = self.cv_processor(image, view=view)
                 if view:
@@ -237,10 +242,12 @@ def main():
     parser.add_argument("--output_video_folder", type=str, help="Path to generated video folder")
     parser.add_argument("--cfg_folder", default="cfg_test", type=str, help="Path to config folder")
     parser.add_argument("--view_videos", action='store_true', help="View videos while generating")
+    parser.add_argument('--frame_delay', default=[3, 6], nargs='+', type=int, help='Frame delay list')
 
     opt = parser.parse_args()
 
     cfgs = [cfg_file for cfg_file in os.listdir(opt.cfg_folder) if ".DS_Store" not in cfg_file]
+    frame_delay = [0] + opt.frame_delay
     input_folders_path = [os.path.join(opt.raw_video_folder, input_video_path) for input_video_path in os.listdir(opt.raw_video_folder)]
     for cfg in cfgs:
         print("-------- Processing cfg {} ---------".format(cfg))
@@ -252,9 +259,10 @@ def main():
                     print("Finish processing video {}".format(video_idx))
                 video_name = os.path.basename(input_video_path)[:-4]
                 cv_name = cfg.split(".")[0]
-                output_video_path = f"{opt.output_video_folder}/{video_name}_{cv_name}.mp4"
-                handler = OpencvHandler(os.path.join(opt.cfg_folder, cfg))
-                handler.process(input_video_path, output_video_path, opt.view_videos)
+                for delay in frame_delay:
+                    output_video_path = f"{opt.output_video_folder}/{video_name}_{cv_name}_{delay}.mp4"
+                    handler = OpencvHandler(os.path.join(opt.cfg_folder, cfg), delay)
+                    handler.process(input_video_path, output_video_path, opt.view_videos)
 
 
                 # if opt.bg_extract:
