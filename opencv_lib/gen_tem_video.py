@@ -27,7 +27,7 @@ class OpencvHandler:
         output_fps = cap.get(cv.CAP_PROP_FPS)
         output_size = (int(cap.get(cv.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv.CAP_PROP_FRAME_HEIGHT)))
         fourcc = cv.VideoWriter_fourcc(*'mp4v')
-        out = cv.VideoWriter(video_output, fourcc, output_fps, output_size, isColor=False)
+        out = cv.VideoWriter(video_output, fourcc, output_fps, output_size)
         frame_idx = 0
 
         while True:

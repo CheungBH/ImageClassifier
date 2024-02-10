@@ -18,5 +18,5 @@ class BackgroundExtractor:
         binary = cv.morphologyEx(binary, cv.MORPH_OPEN, self.se)
         bgimage = self.mog.getBackgroundImage()
         if view:
-            cv.imshow("fgmask", binary)
-        return bgimage
+            cv.imshow("fgmask", bgimage)
+        return cv.cvtColor(binary, cv.COLOR_GRAY2BGR)
