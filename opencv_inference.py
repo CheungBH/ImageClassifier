@@ -24,6 +24,7 @@ class Demo:
         self.show = True if args.show_ratio else False
         self.show_ratio = args.show_ratio
         self.save_ratio = args.save_ratio
+        self.visualize = args.visualize
 
         with open(args.opencv_cfg, 'r') as ft:
             cfg = json.load(ft)
@@ -46,7 +47,7 @@ class Demo:
             self.save_size = (int(self.save_ratio * self.cap.get(3)), int(self.save_ratio * self.cap.get(4)) * 2)
             self.out = cv2.VideoWriter(self.output, fourcc, fps, self.save_size, True)
 
-    def run(self, view=False):
+    def run(self):
         frame_idx = 0
 
         while True:
@@ -54,9 +55,11 @@ class Demo:
             frame_idx += 1
             if ret is True:
                 processed_frame = self.cv_processor(image)
-                if view:
+                processed_frame = self.MI.run(processed_frame, cnt=frame_idx)
+                if self.visualize:
                     cv2.imshow("process_img", processed_frame)
-                self.out.write(processed_frame)
+                if self.output:
+                    self.out.write(processed_frame)
                 c = cv2.waitKey(1)
                 if c == 27:
                     break
