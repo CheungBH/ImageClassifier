@@ -4,6 +4,9 @@ from eval.inference import ModelInference
 import cv2
 import numpy as np
 from utils.utils import load_config
+import json
+from opencv_lib.opencv_class import *
+
 
 image_ext = ["jpg", "jpeg", "webp", "bmp", "png"]
 video_ext = ["mp4", "mov", "avi", "mkv", "MP4"]
@@ -21,12 +24,18 @@ class Demo:
         self.show = True if args.show_ratio else False
         self.show_ratio = args.show_ratio
         self.save_ratio = args.save_ratio
-        self.mog = cv2.createBackgroundSubtractorMOG2()
-        self.se = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-        self.track_len = 15
-        self.detect_interval = 5
-        self.feature_params = dict(maxCorners=100, qualityLevel=0.1, minDistance=7, blockSize=7)
-        self.lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.02))
+
+        with open(args.opencv_cfg, 'r') as ft:
+            cfg = json.load(ft)
+        self.type = cfg["type"]
+        if self.type == "bg":
+            self.cv_processor = BackgroundExtractor(args.opencv_cfg)
+        elif self.type == "optical_flow":
+            self.cv_processor = OpticalFlowProcessor(args.opencv_cfg)
+        elif self.type == "merge_channel":
+            self.cv_processor = MergeChannelProcessor(args.opencv_cfg)
+        else:
+            raise NotImplementedError
 
         self.cap = cv2.VideoCapture(self.input)
         fps = self.cap.get(cv2.CAP_PROP_FPS)
@@ -37,7 +46,24 @@ class Demo:
             self.save_size = (int(self.save_ratio * self.cap.get(3)), int(self.save_ratio * self.cap.get(4)) * 2)
             self.out = cv2.VideoWriter(self.output, fourcc, fps, self.save_size, True)
 
-    def run(self):
+    def process(self, view=False):
+        frame_idx = 0
+
+        while True:
+            ret, image = self.cap.read()
+            frame_idx += 1
+            if ret is True:
+                processed_frame = self.cv_processor(image)
+                if view:
+                    cv2.imshow("process_img", processed_frame)
+                out.write(processed_frame)
+                c = cv2.waitKey(1)
+                if c == 27:
+                    break
+            else:
+                out.release()
+                break
+    def run2(self):
         idx = 0
         tracks = []
         while True:
@@ -104,6 +130,8 @@ if __name__ == '__main__':
     parser.add_argument('--label_path', default="", required=True)
     # parser.add_argument('--backbone', default="mobilenet")
     parser.add_argument('--cfg_path', default="config/model_cfg/mobilenet_all.yaml", type=str)
+    parser.add_argument('--opencv_cfg', default="config/model_cfg/mobilenet_all.yaml", type=str)
+
     parser.add_argument('--device', default="cuda:0")
     parser.add_argument('--output_src', help="")
     parser.add_argument("--inp_size", default=224)
