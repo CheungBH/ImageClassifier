@@ -15,7 +15,7 @@ class OpticalFlowProcessor:
         # self.blockSize = cfg["blockSize"]
         # self.maxLevel = cfg["maxLevel"]
         # self.winSize = str2tuple(cfg["winSize"])
-        self.criteria = cfg["criteria"]
+        # self.criteria = cfg["criteria"]
         self.feature_params = dict(maxCorners=cfg["maxCorners"], qualityLevel=cfg["qualityLevel"],
                                    minDistance=cfg["minDistance"], blockSize=cfg["blockSize"])
         self.lk_params = dict(winSize=str2tuple(cfg["winSize"]), maxLevel=cfg["maxLevel"],
@@ -29,6 +29,7 @@ class OpticalFlowProcessor:
 
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         vis_black = np.zeros_like(frame)
+        tracks = []
 
         if len(self.tracks) > 0:
             img0, img1 = self.prev_gray, frame_gray
