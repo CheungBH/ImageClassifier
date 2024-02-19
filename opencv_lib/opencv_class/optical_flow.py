@@ -1,11 +1,14 @@
 import json
 import cv2 as cv
 from .utils import str2tuple
+import numpy as np
 
 
 class OpticalFlowProcessor:
     def __init__(self, cfg_file):
-        cfg = json.load(cfg_file)
+        with open(cfg_file, 'r') as ft:
+            cfg = json.load(ft)
+
         # self.maxCorners = cfg["maxCorners"]
         # self.qualityLevel = cfg["qualityLevel"]
         # self.minDistance = cfg["minDistance"]
