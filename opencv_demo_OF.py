@@ -15,7 +15,7 @@ class Demo:
     def __init__(self, args):
         settings = load_config(args.cfg_path)
         self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=settings["model"]["backbone"],
-                 visualize=args.visualize, device=args.device)
+                 visualize=args.visualize, device=args.device, inp_size=args.inp_size)
         self.input = args.input_src
         self.output = args.output_src
         self.show = True if args.show_ratio else False
@@ -82,8 +82,10 @@ class Demo:
                 prev_gray = frame_gray
                 cv2.imshow('track', vis)
                 cv2.imshow("raw", vis_black)
+                cv2.waitKey(1)
                 canvas = np.concatenate((vis, vis_black), axis=0)
-                self.out.write(canvas)
+                if args.output_src:
+                    self.out.write(canvas)
 
             else:
                 self.MI.release()
@@ -104,6 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--cfg_path', default="config/model_cfg/mobilenet_all.yaml", type=str)
     parser.add_argument('--device', default="cuda:0")
     parser.add_argument('--output_src', help="")
+    parser.add_argument("--inp_size", default=224)
 
     parser.add_argument('--save_ratio', default=1, type=float)
     parser.add_argument('--show_ratio', default=1, type=float)

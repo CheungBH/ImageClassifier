@@ -25,8 +25,8 @@ class ModelInference:
         _, self.pred_idx = torch.max(self.scores, 1)
         self.pred_cls = self.classes[self.pred_idx]
         font = cv2.FONT_HERSHEY_SIMPLEX
-        if self.visualize:
-            cv2.putText(img, self.pred_cls, (50, 50), font, 2, self.colors[self.pred_idx], 3)
+        # if self.visualize:
+        cv2.putText(img, self.pred_cls, (50, 50), font, 2, self.colors[self.pred_idx], 3)
         return img
 
     def release(self):
