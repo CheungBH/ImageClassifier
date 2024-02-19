@@ -241,12 +241,17 @@ def main():
     parser.add_argument("--raw_video_folder", type=str, help="Path to raw video folder")
     parser.add_argument("--output_video_folder", type=str, help="Path to generated video folder")
     parser.add_argument("--cfg_folder", default="cfg_test", type=str, help="Path to config folder")
+    parser.add_argument("--cfg_file", default="", type=str, help="Path to config folder")
     parser.add_argument("--view_videos", action='store_true', help="View videos while generating")
     parser.add_argument('--frame_delay', default=[], nargs='+', type=int, help='Frame delay list')
 
     opt = parser.parse_args()
 
     cfgs = [cfg_file for cfg_file in os.listdir(opt.cfg_folder) if ".DS_Store" not in cfg_file]
+    if opt.cfg_file:
+        cfgs = [opt.cfg_file]
+        opt.cfg_folder = ""
+        print("Using single cfg file: {}. Ignoring cfg_folder".format(opt.cfg_file))
     frame_delay = [0] + opt.frame_delay
     input_folders_path = [os.path.join(opt.raw_video_folder, input_video_path) for input_video_path in os.listdir(opt.raw_video_folder)]
     for cfg in cfgs:

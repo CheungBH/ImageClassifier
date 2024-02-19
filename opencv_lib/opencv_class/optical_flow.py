@@ -29,7 +29,7 @@ class OpticalFlowProcessor:
 
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         vis_black = np.zeros_like(frame)
-        tracks = []
+        # tracks = []
 
         if len(self.tracks) > 0:
             img0, img1 = self.prev_gray, frame_gray
@@ -54,21 +54,21 @@ class OpticalFlowProcessor:
 
                 cv.circle(vis_black, (int(x), int(y)), 3, (255, 0, 0), 3, 1)
 
-            tracks = new_tracks
-            cv.polylines(vis_black, [np.int32(tr) for tr in tracks], False, (0, 255, 0), 3)
+            self.tracks = new_tracks
+            cv.polylines(vis_black, [np.int32(tr) for tr in self.tracks], False, (0, 255, 0), 3)
 
         if self.frame_idx % self.detect_interval == 0:
             mask = np.zeros_like(frame_gray)
             mask[:] = 255
 
             if self.frame_idx != 0:
-                for x, y in [np.int32(tr[-1]) for tr in tracks]:
+                for x, y in [np.int32(tr[-1]) for tr in self.tracks]:
                     cv.circle(mask, (x, y), 5, 0, -1)
 
             p = cv.goodFeaturesToTrack(frame_gray, mask=mask, **self.feature_params)
             if p is not None:
                 for x, y in np.float32(p).reshape(-1, 2):
-                    tracks.append([(x, y)])
+                    self.tracks.append([(x, y)])
 
         self.frame_idx += 1
         self.prev_gray = frame_gray
