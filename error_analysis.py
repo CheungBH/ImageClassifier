@@ -68,6 +68,7 @@ def error_analyse(args):
         EAR.update(names[0].split("/")[-1], (loss.tolist(), outputs.max().tolist(), outputs[0][labels].tolist()[0],
                                              int(torch.max(outputs, 1)[1] == labels)))
     EAR.release()
+    print("Error analysis has been saved in {}".format(args.logger_path))
 
 
 class AutoErrorAnalyser:
