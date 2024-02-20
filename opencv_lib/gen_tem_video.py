@@ -255,11 +255,14 @@ def main():
     frame_delay = [0] + opt.frame_delay
     input_folders_path = [os.path.join(opt.raw_video_folder, input_video_path) for input_video_path in os.listdir(opt.raw_video_folder)]
     for cfg in cfgs:
-        print("-------- Processing cfg {} ---------".format(cfg))
+        cfg_folder_name = cfg.split(".")[0]
+        print("-------- Processing cfg {} [{}/{}]---------".format(cfg, cfgs.index(cfg) + 1, len(cfgs)))
         for input_folder_path in input_folders_path:
-            print("-------- Processing folder {} ---------".format(input_folder_path))
+            if ".DS_Store" in input_folder_path:
+                continue
+            print("Processing folder {}".format(input_folder_path))
             input_video_paths = [os.path.join(input_folder_path, input_video_path) for input_video_path in os.listdir(input_folder_path)]
-            folder_path = os.path.join(opt.output_video_folder, input_folder_path.split("/")[-1])
+            folder_path = os.path.join(opt.output_video_folder, cfg_folder_name, input_folder_path.split("/")[-1])
             os.makedirs(folder_path, exist_ok=True)
             for video_idx, input_video_path in enumerate(input_video_paths):
                 if video_idx % 20 == 0:
