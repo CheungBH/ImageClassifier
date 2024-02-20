@@ -2,7 +2,7 @@
 
 from eval.inference import ModelInference
 import cv2
-import numpy as np
+import copy
 from utils.utils import load_config
 import json
 from opencv_lib.opencv_class import *
@@ -54,12 +54,14 @@ class Demo:
             ret, image = self.cap.read()
             frame_idx += 1
             if ret is True:
+                image_copy = copy.deepcopy(image)
                 processed_frame = self.cv_processor(image)
                 processed_frame = self.MI.run(processed_frame, cnt=frame_idx)
+                merged_frame = cv2.vconcat((image_copy, processed_frame))
                 if self.visualize:
-                    cv2.imshow("process_img", processed_frame)
+                    cv2.imshow("process_img", merged_frame)
                 if self.output:
-                    self.out.write(processed_frame)
+                    self.out.write(merged_frame)
                 c = cv2.waitKey(1)
                 if c == 27:
                     break
