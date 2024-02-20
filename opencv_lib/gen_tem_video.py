@@ -255,7 +255,7 @@ def main():
     frame_delay = [0] + opt.frame_delay
     input_folders_path = [os.path.join(opt.raw_video_folder, input_video_path) for input_video_path in os.listdir(opt.raw_video_folder)]
     for cfg in cfgs:
-        cfg_folder_name = cfg.split(".")[0]
+        cfg_folder_name = cfg.split("/")[-1].split(".")[0]
         print("-------- Processing cfg {} [{}/{}]---------".format(cfg, cfgs.index(cfg) + 1, len(cfgs)))
         for input_folder_path in input_folders_path:
             if ".DS_Store" in input_folder_path:
