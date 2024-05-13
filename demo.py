@@ -15,7 +15,7 @@ fps = 12
 class Demo:
     def __init__(self, args):
         if args.cfg_path is None:
-            args.cfg_path = "/".join(args.model_path.split("/")[:-1]) + "config.yaml"
+            args.cfg_path = "/".join(args.model_path.split("/")[:-1]) + "/config.yaml"
             assert os.path.exists(args.cfg_path), "The config file does not exist!"
         settings = load_config(args.cfg_path)
         backbone = settings["model"]["backbone"]

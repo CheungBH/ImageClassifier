@@ -25,7 +25,7 @@ def test(args):
     model_path = args.model_path
     data_path = args.data_path
     if args.cfg_path is None:
-        args.cfg_path = "/".join(args.model_path.split("/")[:-1]) + "config.yaml"
+        args.cfg_path = "/".join(args.model_path.split("/")[:-1]) + "/config.yaml"
         assert os.path.exists(args.cfg_path), "The config file does not exist!"
     settings = load_config(args.cfg_path)
 
@@ -76,6 +76,7 @@ def test(args):
         )
 
     loss, acc, auc, pr, cls_metrics = EpochEval.calculate()
+    EpochEval.generate_confusion_matrix(plot=True, labels=args.labels)
     TR.process([loss, acc, auc, pr], cls_metrics)
 
 
@@ -100,8 +101,8 @@ if __name__ == '__main__':
     parser.add_argument('--data_path', required=True)
     parser.add_argument('--cfg_path', default=None)
     parser.add_argument('--phase', default="val")
-    parser.add_argument('--batch_size', default=32, type=int)
-    parser.add_argument('--num_worker', default=0, type=int)
+    parser.add_argument('--batch_size', default=64, type=int)
+    parser.add_argument('--num_worker', default=4, type=int)
     parser.add_argument('--auto', action="store_true")
     parser.add_argument('--device', default="cuda:0")
     args = parser.parse_args()

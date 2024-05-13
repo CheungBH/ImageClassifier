@@ -9,6 +9,7 @@ class EpochEvaluator:
         self.outputs, self.labels = [], []
         self.MC = MetricCalculator()
         self.loss = 0
+        self.classes_matrix = torch.zeros(num_cls, num_cls)
 
     def update(self, outputs, labels, loss):
         self.loss += loss * len(outputs)
@@ -36,6 +37,21 @@ class EpochEvaluator:
             cls_auc.append(self.cls_MCs[i].cal_auc(sampled_outputs, sampled_labels))
             cls_pr.append(self.cls_MCs[i].cal_PR(sampled_outputs, sampled_labels))
         return cls_acc, cls_auc, cls_pr
+
+    def generate_confusion_matrix(self, plot=False, labels=""):
+        # _, preds = torch.max(self.outputs, 1)
+        for t, p in zip(self.labels, self.outputs):
+            self.classes_matrix[t.long(), p.long()] += 1
+        if plot:
+            from matplotlib import pyplot as plt
+            import seaborn as sns
+            plt.figure(figsize=(len(labels) + 2, len(labels) + 2))
+            sns.heatmap(self.classes_matrix.int(), annot=True, fmt='d', cmap='Blues', cbar=False,
+                        xticklabels=labels, yticklabels=labels)
+            # plt.xlabel('Predicted')
+            # plt.ylabel('True')
+            plt.title('Confusion Matrix')
+            plt.show()
 
 
 class BatchEvaluator:
