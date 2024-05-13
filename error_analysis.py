@@ -13,7 +13,7 @@ try:
     mix_precision = True
 except ImportError:
     mix_precision = False
-
+import os
 import config.config as config
 from utils.utils import load_config
 
@@ -27,6 +27,9 @@ def error_analyse(args):
     label_path = args.label_path
     num_worker = args.num_worker
     phase = args.phase
+    if args.cfg_path is None:
+        args.cfg_path = "/".join(args.model_path.split("/")[:-1]) + "config.yaml"
+        assert os.path.exists(args.cfg_path), "The config file does not exist!"
     settings = load_config(args.cfg_path)
 
     backbone = settings["model"]["backbone"]
@@ -91,7 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--data_path', required=True)
     parser.add_argument('--label_path', default="")
-    parser.add_argument('--cfg_path', required=True)
+    parser.add_argument('--cfg_path', default=None)
     parser.add_argument('--phase', default="val")
     parser.add_argument('--logger_path', default="")
     parser.add_argument('--data_percentage', '-dp', type=float, default=1)

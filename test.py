@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 
-from dataset.utils import get_pretrain
+import os
 from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
 from eval.evaluate import EpochEvaluator, BatchEvaluator
@@ -24,6 +24,9 @@ def test(args):
 
     model_path = args.model_path
     data_path = args.data_path
+    if args.cfg_path is None:
+        args.cfg_path = "/".join(args.model_path.split("/")[:-1]) + "config.yaml"
+        assert os.path.exists(args.cfg_path), "The config file does not exist!"
     settings = load_config(args.cfg_path)
 
     batch_size = args.batch_size
@@ -95,7 +98,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--data_path', required=True)
-    parser.add_argument('--cfg_path', default="config/model_cfg/mobilenet_all.yaml")
+    parser.add_argument('--cfg_path', default=None)
     parser.add_argument('--phase', default="val")
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--num_worker', default=0, type=int)
