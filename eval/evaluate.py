@@ -41,7 +41,7 @@ class EpochEvaluator:
     def generate_confusion_matrix(self, plot=False, labels=""):
         # _, preds = torch.max(self.outputs, 1)
         for t, p in zip(self.labels, self.outputs):
-            self.classes_matrix[t.long(), p.long()] += 1
+            self.classes_matrix[t.long(), torch.argmax(p)] += 1
         if plot:
             from matplotlib import pyplot as plt
             import seaborn as sns

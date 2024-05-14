@@ -14,7 +14,7 @@ class BaseLogger:
             excel_path = os.path.join(self.folder, "{}.csv".format(kw))
 
         if not os.path.exists(excel_path):
-            self.file = open(excel_path, "w")
+            self.file = open(excel_path, "w", encoding="utf-8")
             self.write_title()
         else:
             self.file = open(excel_path, "a+")
