@@ -9,6 +9,8 @@ class CriteriaInitializer:
         crit = args.crit
         if crit == "CE":
             return nn.CrossEntropyLoss()
+        elif crit == "ML":
+            return nn.MultiLabelSoftMarginLoss()
         else:
             raise NotImplementedError("Current criteria '{}' is not supported yet".format(crit))
 

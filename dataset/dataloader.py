@@ -11,36 +11,34 @@ import random
 
 
 class ClassifyDataset(Dataset):
-    def __init__(self, img_path, label_cls, settings, is_train=True, data_percentage=1):
+    def __init__(self, img_path, label_cls, settings, is_train=True, data_percentage=1, label_folder="labels"):
         img_dir_name, img_dir_label, self.img_name, self.img_label = [], [], [], []
         self.data_percentage = data_percentage
         self.size = settings["model"]["input_size"]
         self.label = []
         self.is_train = is_train
         self.init_augment(settings)
-        image_label_dict = label_cls
+        # image_label_dict = label_cls
         self.transforms = transforms.Compose([
             transforms.Resize((self.size, self.size)),
             transforms.ToTensor(),
             transforms.Normalize(mean=settings["transform"]["mean"], std=settings["transform"]["std"])
         ])
-        # image_label_dict = os.listdir(img_path)
 
-        for idx, cls in enumerate(image_label_dict):
-            self.label.append(cls)
-            img_dir_name.append(os.path.join(img_path, cls))
-            img_dir_label.append(idx)
+        img_folder = os.path.join(img_path, "image")
+        label_folder = os.path.join(img_path, label_folder)
+        img_file_names = os.listdir(img_folder)
+        for idx, img_name in enumerate(img_file_names):
+            if (idx * self.data_percentage) % 1 != 0:
+                continue
 
-        for dir_name, dir_label in zip(img_dir_name, img_dir_label):
-            img_file_names = os.listdir(os.path.join(dir_name))
-            for idx, img_name in enumerate(img_file_names):
-                if (idx * self.data_percentage) % 1 != 0:
-                    continue
-                self.img_name.append(os.path.join(dir_name, img_name))
-                self.img_label.append(dir_label)
-
-        # self.image_processor = image_processor
-        self.label_nums = Counter(self.img_label)
+            label = [0 for _ in range(len(label_cls))]
+            self.img_name.append(os.path.join(img_folder, img_name))
+            with open(os.path.join(label_folder, os.path.splitext(img_name)[0] + ".txt"), "r") as f:
+                img_label = f.readline().strip()
+            for l in img_label:
+                label[label_cls.index(l)] = 1
+            self.img_label.append(label)
 
     def __len__(self):
         return len(self.img_name)
