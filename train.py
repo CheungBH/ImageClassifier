@@ -105,19 +105,18 @@ def train(args):
                     schedule.update(phase, "iter")
 
                 EpochEval.update(outputs, labels, loss)
-                batch_loss, batch_acc, batch_auc, batch_pr = BatchEval.update(loss, outputs, labels)
+                # batch_loss, batch_acc, batch_auc, batch_pr = BatchEval.update(loss, outputs, labels)
                 loader_desc.set_description(
-                    '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-                        format(phase=phase, epoch=epoch, loss=batch_loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
+                    '{phase}: {epoch} | loss: {loss:.8f}'.format(phase=phase, epoch=epoch, loss=loss,)# acc=batch_acc, AUC=batch_auc, PR=batch_pr)
                 )
 
-            loss, acc, auc, pr, cls_metric = EpochEval.calculate()
-            TR.update(model, (loss, acc, auc, pr), epoch, phase, cls_metric)
+            # loss, acc, auc, pr, cls_metric = EpochEval.calculate()
+            # TR.update(model, (loss, acc, auc, pr), epoch, phase, cls_metric)
         schedule.update(phase, "epoch")
         args.iterations = iterations
         args.start_epoch = epoch
-        args.train_loss, args.train_acc, args.train_auc, args.train_pr, args.val_loss, args.val_acc, args.val_auc, \
-            args.val_pr = TR.get_best_metrics()
+        # args.train_loss, args.train_acc, args.train_auc, args.train_pr, args.val_loss, args.val_acc, args.val_auc, \
+        #     args.val_pr = TR.get_best_metrics()
         TR.save_option(args)
         print("------------------------------------------------------------------------")
     TR.release()

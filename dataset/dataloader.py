@@ -25,7 +25,7 @@ class ClassifyDataset(Dataset):
             transforms.Normalize(mean=settings["transform"]["mean"], std=settings["transform"]["std"])
         ])
 
-        img_folder = os.path.join(img_path, "image")
+        img_folder = os.path.join(img_path, "images")
         label_folder = os.path.join(img_path, label_folder)
         img_file_names = os.listdir(img_folder)
         for idx, img_name in enumerate(img_file_names):
@@ -35,8 +35,8 @@ class ClassifyDataset(Dataset):
             label = [0 for _ in range(len(label_cls))]
             self.img_name.append(os.path.join(img_folder, img_name))
             with open(os.path.join(label_folder, os.path.splitext(img_name)[0] + ".txt"), "r") as f:
-                img_label = f.readline().strip()
-            for l in img_label:
+                img_labels = [line.replace("\n", "") for line in f.readlines()]#.strip()
+            for l in img_labels:
                 label[label_cls.index(l)] = 1
             self.img_label.append(label)
 
@@ -60,7 +60,7 @@ class ClassifyDataset(Dataset):
         if self.is_train:
             image = self.augment(image)
         image = self.transforms(image)
-        return image_name, image, label
+        return image_name, image, torch.tensor(label)
 
     def augment(self, image):
         image = transforms.RandomHorizontalFlip(p=self.flip_ratio)(image)
@@ -98,7 +98,7 @@ class DataLoader:
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
                                                                 shuffle=shuffle, num_workers=num_worker)
                             for x in self.phases}
-        self.cls_num = len(self.image_datasets[self.phases[0]].label)
+        self.cls_num = len(self.label)
 
     def get_labels(self, img_dir, label_path):
         if label_path:
