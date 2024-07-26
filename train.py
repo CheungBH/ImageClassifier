@@ -14,7 +14,7 @@ import torch
 from tqdm import tqdm
 try:
     from apex import amp
-    mix_precision = True
+    mix_precision = False
 except ImportError:
     mix_precision = False
 
@@ -86,7 +86,7 @@ def train(args):
                     else:
                         outputs = model(inputs)
                         outputs = MB.sigmoid(outputs)
-                        loss = criterion(outputs, labels)
+                        loss = criterion(outputs, labels.float())
 
                 if phase == 'train':
                     iterations += 1

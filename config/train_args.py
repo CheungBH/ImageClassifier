@@ -19,22 +19,22 @@ parser.add_argument('--freeze', default=0, type=int)
 parser.add_argument('--batch_size', default=32, type=int)
 parser.add_argument('--epochs', default=20, type=int)
 parser.add_argument('--start_epoch', default=0, type=int)
-parser.add_argument('--num_worker', default=0, type=int)
+parser.add_argument('--num_worker', default=4, type=int)
 parser.add_argument('--iteration', default=0, type=int)
 parser.add_argument('--sparse', default=0, type=float)
 parser.add_argument('--load_weight', default="", type=str)
 parser.add_argument('--resume', action="store_true")
 
 '''optimize configuration'''
-parser.add_argument('--optMethod', default="adam", type=str)
-parser.add_argument('--LR', default=0.001, type=float)
+parser.add_argument('--optMethod', default="sgd", type=str)
+parser.add_argument('--LR', default=0.01, type=float)
 parser.add_argument('--weightDecay', default=0, type=float)
 parser.add_argument('--momentum', default=0, type=float)
 parser.add_argument('--schedule', default="step", type=str)
 parser.add_argument('--schedule_gamma', default="")
 
 '''criteria configuration'''
-parser.add_argument('--crit', default="ML", type=str)
+parser.add_argument('--crit', default="BCE", type=str)
 
 '''other configuration'''
 parser.add_argument('--save_dir', "-s", default="weights", type=str)

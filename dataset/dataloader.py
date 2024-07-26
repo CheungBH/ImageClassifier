@@ -31,6 +31,8 @@ class ClassifyDataset(Dataset):
         for idx, img_name in enumerate(img_file_names):
             if (idx * self.data_percentage) % 1 != 0:
                 continue
+            if not img_name.endswith(".jpg"):
+                continue
 
             label = [0 for _ in range(len(label_cls))]
             self.img_name.append(os.path.join(img_folder, img_name))

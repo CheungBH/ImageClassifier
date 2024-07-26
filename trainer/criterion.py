@@ -11,6 +11,8 @@ class CriteriaInitializer:
             return nn.CrossEntropyLoss()
         elif crit == "ML":
             return nn.MultiLabelSoftMarginLoss()
+        elif crit == "BCE":
+            return nn.BCEWithLogitsLoss()
         else:
             raise NotImplementedError("Current criteria '{}' is not supported yet".format(crit))
 
