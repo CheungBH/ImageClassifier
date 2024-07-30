@@ -1,0 +1,18 @@
+transform:
+  flip:
+    p: 0.5
+  rotate:
+    max_factor: 10
+    p: 0
+  brightness:
+    max_factor: 0.2
+    p: 0
+  contrast:
+    max_factor: 0.2
+    p: 0
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+
+model:
+  backbone: 'shufflenet'
+  input_size: 112

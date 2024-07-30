@@ -110,8 +110,11 @@ def train(args):
                     '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=epoch, loss=loss, acc=batch_acc)# , AUC=batch_auc, PR=batch_pr)
                 )
 
-            loss, acc, auc, pr, cls_metric = EpochEval.calculate()
-            TR.update(model, (loss, acc, auc, pr), epoch, phase, cls_metric)
+            loss, acc, cls_metric = EpochEval.calculate()
+            loader_desc.set_description(
+                '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=epoch, loss=loss,
+                                                                              acc=acc)            )
+            TR.update(model, (loss, acc), epoch, phase, [cls_metric])
         schedule.update(phase, "epoch")
         args.iterations = iterations
         args.start_epoch = epoch

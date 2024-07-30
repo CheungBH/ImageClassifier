@@ -2,7 +2,7 @@ import os
 
 
 class txtLogger:
-    def __init__(self, folder, metrics, round_size=(8, 4, 4, 4)):
+    def __init__(self, folder, metrics, round_size=(8, 4)):
         self.folder = folder
         self.metrics = metrics
         self.round_size = round_size
