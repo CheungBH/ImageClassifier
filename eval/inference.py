@@ -22,11 +22,19 @@ class ModelInference:
     def run(self, img, cnt=0):
         img_tns = image_normalize(img, size=self.model_size)
         self.scores = self.MB.inference(img_tns)
-        _, self.pred_idx = torch.max(self.scores, 1)
-        self.pred_cls = self.classes[self.pred_idx]
+        # self.exists = self.scores > 0.5
+        # _, self.pred_idx = torch.max(self.scores, 1)
+        # self.pred_cls = [cls for cls, exist in zip(self.classes, self.exists) if exist]
         font = cv2.FONT_HERSHEY_SIMPLEX
         # if self.visualize:
-        cv2.putText(img, self.pred_cls, (50, 50), font, 2, self.colors[self.pred_idx], 3)
+        cls_cnt = 0
+        for i, score in enumerate(self.scores[0]):
+            if score < 0.5:
+                continue
+            string = "{}: {:.2f}".format(self.classes[i], score)
+            img = cv2.putText(img, string, (50, 50 + 50 * i), font, 2, self.colors[i], 3)
+            cls_cnt += 1
+        # cv2.putText(img, string, (50, 50), font, 2, self.colors[self.pred_idx], 3)
         return img
 
     def release(self):

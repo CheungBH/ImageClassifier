@@ -53,8 +53,8 @@ class ModelBuilder:
         self.image_batch_tensor = input_tensor.cuda() if self.device != "cpu" else input_tensor
         outputs = self.CNN.model(self.image_batch_tensor)
         outputs_tensor = outputs.data
-        m_softmax = nn.Softmax(dim=1)
-        outputs_tensor = m_softmax(outputs_tensor).to("cpu")
+        # m_softmax = nn.Sig(dim=1)
+        outputs_tensor = self.sigmoid(outputs_tensor).to("cpu")
         return outputs_tensor
 
     def freeze(self, freeze, freeze_bn=0):
