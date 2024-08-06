@@ -85,7 +85,7 @@ def train(args):
                         loss = loss1 + 0.4 * loss2
                     else:
                         outputs = model(inputs)
-                        outputs = MB.sigmoid(outputs)
+                        # outputs = MB.sigmoid(outputs)
                         loss = criterion(outputs, labels.float())
 
                 if phase == 'train':
@@ -111,6 +111,7 @@ def train(args):
                 )
 
             loss, acc, cls_metric = EpochEval.calculate()
+            print("{}: {}".format(phase, acc))
             loader_desc.set_description(
                 '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=epoch, loss=loss,
                                                                               acc=acc)            )

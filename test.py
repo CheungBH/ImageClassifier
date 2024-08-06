@@ -65,19 +65,22 @@ def test(args):
                 loss = loss1 + 0.4 * loss2
             else:
                 outputs = model(inputs)
-                outputs = MB.softmax(outputs)
+                outputs = MB.sigmoid(outputs)
                 loss = criterion(outputs, labels)
 
-        EpochEval.update(outputs, labels, loss)
-        batch_loss, batch_acc, batch_auc, batch_pr = BatchEval.update(loss, outputs, labels)
-        loader_desc.set_description(
-            'Test: loss: {loss:.8f} | acc: {acc:.2f} | AUC: {AUC:.4f} | PR: {PR:.4f}'.
-                format(loss=batch_loss, acc=batch_acc, AUC=batch_auc, PR=batch_pr)
-        )
+            EpochEval.update(outputs, labels, loss)
+            batch_loss, batch_acc = BatchEval.update(loss, outputs, labels)
+            loader_desc.set_description(
+                '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=-1, loss=loss,
+                                                                              acc=batch_acc)
+                # , AUC=batch_auc, PR=batch_pr)
+            )
 
-    loss, acc, auc, pr, cls_metrics = EpochEval.calculate()
-    EpochEval.generate_confusion_matrix(plot=True, labels=args.labels)
-    TR.process([loss, acc, auc, pr], cls_metrics)
+        loss, acc, cls_metric = EpochEval.calculate()
+        loader_desc.set_description(
+            '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=-1, loss=loss,
+                                                                          acc=acc))
+        TR.update(model, (loss, acc), -1, phase, [cls_metric])
 
 
 class AutoTester:
