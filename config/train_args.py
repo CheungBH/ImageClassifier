@@ -5,10 +5,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--data_path', required=True)
 parser.add_argument('--label_path', default="")
 parser.add_argument('--trainval_ratio', default=-1, type=float)
-parser.add_argument('--flip_prob', default=0.5, type=float)
-parser.add_argument('--rotate_prob', default=0.2, type=float)
-parser.add_argument('--rotate_angle', default=40, type=int)
-parser.add_argument('--brightness_prob', default=0.2, type=float)
 parser.add_argument('--data_percentage', '-dp', type=float, default=1)
 
 '''model configuration'''

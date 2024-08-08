@@ -95,8 +95,7 @@ class DataLoader:
         self.build(data_dir, settings, label_path, batch_size, num_worker, data_percentage=data_percentage)
 
     def build(self, data_dir, settings, label_path="", batch_size=32, num_worker=2, shuffle=True, **kwargs):
-        self.label_path = label_path
-        self.label = self.get_labels(data_dir, label_path)
+        self.label, self.label_path = self.get_labels(data_dir, label_path)
         self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), self.label, is_train=x == "train", settings=settings, **kwargs) for x in self.phases}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
                                                                 shuffle=shuffle, num_workers=num_worker)
@@ -108,12 +107,12 @@ class DataLoader:
             return read_labels(label_path)
         label_path = os.path.join(img_dir, "labels.txt")
         if os.path.exists(label_path):
-            return read_labels(label_path)
+            return read_labels(label_path), label_path
         else:
             phase_dir = os.path.join(img_dir, "train")
             labels = [cls for cls in os.listdir(phase_dir) if os.path.isdir(os.path.join(phase_dir, cls))]
             with open(label_path, "w") as f:
                 for label in labels:
                     f.write(label + "\n")
-            return labels
+            return labels, label_path
 
