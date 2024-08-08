@@ -95,7 +95,7 @@ class DataLoader:
         self.build(data_dir, settings, label_path, batch_size, num_worker, data_percentage=data_percentage)
 
     def build(self, data_dir, settings, label_path="", batch_size=32, num_worker=2, shuffle=True, **kwargs):
-        self.label = self.get_labels(data_dir, label_path)
+        self.label, self.label_path = self.get_labels(data_dir, label_path)
         self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), self.label, is_train=x == "train", settings=settings, **kwargs) for x in self.phases}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
                                                                 shuffle=shuffle, num_workers=num_worker)
@@ -114,5 +114,5 @@ class DataLoader:
             with open(label_path, "w") as f:
                 for label in labels:
                     f.write(label + "\n")
-            return labels
+            return labels, label_path
 

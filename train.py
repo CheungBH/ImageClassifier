@@ -62,6 +62,8 @@ def train(args):
         m, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 
     shutil.copy(args.cfg_path, os.path.join(args.save_dir, "config.yaml"))
+    shutil.copy(data_loader.label_path, os.path.join(args.save_dir, "labels.txt"))
+
     for epoch in range(epochs)[args.start_epoch:]:
         for phase in ["train", "val"]:
             EpochEval = EpochEvaluator(data_loader.cls_num)
