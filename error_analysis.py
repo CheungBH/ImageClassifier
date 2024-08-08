@@ -65,7 +65,7 @@ def error_analyse(args):
                 loss = criterion(outputs, labels.float())
 
         loader_desc.set_description("Error analysing")
-        EAR.update(names[0].split("/")[-1], loss.tolist(), labels, outputs)
+        EAR.update(names[0].split("/")[-1], loss.tolist(), labels[0], outputs[0])
     EAR.release()
     print("Error analysis has been saved in {}".format(args.logger_path))
 
