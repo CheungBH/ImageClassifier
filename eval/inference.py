@@ -8,7 +8,7 @@ import torch
 
 
 class ModelInference:
-    def __init__(self, model_path, label_path, backbone, visualize, inp_size, device="cuda:0"):
+    def __init__(self, model_path, label_path, backbone, visualize, inp_size, device="cuda:0", conf=0.5):
         self.backbone = backbone if backbone else get_pretrain(model_path)
         self.model_size = inp_size
         self.classes = read_labels(label_path)
@@ -17,6 +17,8 @@ class ModelInference:
         self.MB.load_weight(model_path)
         self.model.eval()
         self.visualize = visualize
+        self.device = device
+        self.conf = conf
         self.colors = [[random.randint(0, 255) for _ in range(3)] for _ in range(len(self.classes))]
 
     def run(self, img, cnt=0):
@@ -29,7 +31,7 @@ class ModelInference:
         # if self.visualize:
         cls_cnt = 0
         for i, score in enumerate(self.scores[0]):
-            if score < 0.5:
+            if score < self.conf:
                 continue
             string = "{}: {:.2f}".format(self.classes[i], score)
             img = cv2.putText(img, string, (50, 50 + 50 * i), font, 2, self.colors[i], 3)

@@ -5,11 +5,12 @@ from sklearn.metrics import accuracy_score
 
 
 class EpochEvaluator:
-    def __init__(self, num_cls):
+    def __init__(self, num_cls, conf=0.5):
         self.cls_MCs = [MetricCalculator() for _ in range(num_cls)]
         self.outputs, self.labels = [], []
         self.MC = MetricCalculator()
         self.loss = 0
+        self.conf = conf
         self.classes_matrix = torch.zeros(num_cls, num_cls)
 
     def update(self, outputs, labels, loss):
@@ -23,7 +24,7 @@ class EpochEvaluator:
 
     def calculate(self):
         loss = self.loss / len(self.labels)
-        acc = accuracy_score(self.labels.cpu(), (self.outputs > 0.5).cpu())
+        acc = accuracy_score(self.labels.cpu(), (self.outputs > self.conf).cpu())
         # acc, auc, pr = self.MC.calculate_all(self.outputs, self.labels)
         cls_acc = self.calculate_cls()
         return loss.tolist(), acc, cls_acc

@@ -22,7 +22,7 @@ class Demo:
         inp_size = settings["model"]["input_size"]
 
         self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=backbone,
-                 visualize=args.visualize, device=args.device, inp_size=inp_size)
+                 visualize=args.visualize, device=args.device, inp_size=inp_size, conf=args.conf)
         self.input = args.input_src
         self.output = args.output_src
         self.show = True if args.show_ratio else False
@@ -104,7 +104,7 @@ class Demo:
                 if self.show:
                     show_size = (int(self.show_ratio * frame.shape[1]), int(self.show_ratio * frame.shape[0]))
                     cv2.imshow("result", cv2.resize(frame, show_size))
-                    cv2.waitKey(1)
+                    cv2.waitKey(0)
                 if self.output:
                     save_size = (int(self.save_ratio * frame.shape[1]), int(self.save_ratio * frame.shape[0]))
                     cv2.imwrite(self.output_imgs[idx], cv2.resize(frame, save_size))
@@ -139,6 +139,7 @@ if __name__ == '__main__':
     parser.add_argument('--cfg_path', default=None)
     parser.add_argument('--device', default="cuda:0")
     parser.add_argument('--output_src', help="")
+    parser.add_argument('--conf', default=0.5, type=float)
 
     parser.add_argument('--save_ratio', default=1, type=float)
     parser.add_argument('--show_ratio', default=1, type=float)

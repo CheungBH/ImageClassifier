@@ -68,8 +68,8 @@ class TestRecorder:
 
 
 class ErrorAnalyserRecorder:
-    def __init__(self, model_name, metric_names=(), auto=False, phase="val", logger_path=""):
-        self.metric_names = metric_names
+    def __init__(self, model_name, labels, auto=False, phase="val", logger_path=""):
+        self.metric_names = ["loss"] + ["{}_label".format(l) for l in labels] + ["{}_output".format(l) for l in labels]
         self.phase = phase
         self.name = []
         self.auto = auto
@@ -78,10 +78,15 @@ class ErrorAnalyserRecorder:
         self.model_name = model_name
         self.logger_path = logger_path
 
-    def update(self, name, metrics):
+    def update(self, name, loss, outputs, labels):
         self.name.append(name)
-        for idx in range(len(metrics)):
-            self.records[idx].append(metrics[idx])
+        # for idx in range(len(metrics)):
+        #     self.records[idx].append(metrics[idx])
+        self.records[0].append(loss)
+        for idx in range(len(labels)):
+            self.records[idx + 1].append(labels[idx])
+        for idx in range(len(outputs)):
+            self.records[idx + len(labels) + 1].append(outputs[idx])
 
     def release(self):
         for idx in range(len(self.metric_names)):

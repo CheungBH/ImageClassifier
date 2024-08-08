@@ -44,7 +44,7 @@ def test(args):
     MB = ModelBuilder()
     model = MB.build(data_loader.cls_num, backbone, args.device)
     MB.load_weight(model_path)
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.BCELoss()
 
     EpochEval = EpochEvaluator(data_loader.cls_num)
     BatchEval = BatchEvaluator()
@@ -66,7 +66,7 @@ def test(args):
             else:
                 outputs = model(inputs)
                 outputs = MB.sigmoid(outputs)
-                loss = criterion(outputs, labels)
+                loss = criterion(outputs, labels.float())
 
             EpochEval.update(outputs, labels, loss)
             batch_loss, batch_acc = BatchEval.update(loss, outputs, labels)
@@ -80,7 +80,7 @@ def test(args):
         loader_desc.set_description(
             '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=-1, loss=loss,
                                                                           acc=acc))
-        TR.update(model, (loss, acc), -1, phase, [cls_metric])
+        # TR.update(model, (loss, acc), -1, phase, [cls_metric])
 
 
 class AutoTester:
@@ -106,6 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--phase', default="val")
     parser.add_argument('--batch_size', default=64, type=int)
     parser.add_argument('--num_worker', default=4, type=int)
+    parser.add_argument('--conf', default=0.5, type=float)
     parser.add_argument('--auto', action="store_true")
     parser.add_argument('--device', default="cuda:0")
     args = parser.parse_args()

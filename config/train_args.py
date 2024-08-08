@@ -26,7 +26,7 @@ parser.add_argument('--load_weight', default="", type=str)
 parser.add_argument('--resume', action="store_true")
 
 '''optimize configuration'''
-parser.add_argument('--optMethod', default="sgd", type=str)
+parser.add_argument('--optMethod', default="adam", type=str)
 parser.add_argument('--LR', default=0.001, type=float)
 parser.add_argument('--weightDecay', default=0, type=float)
 parser.add_argument('--momentum', default=0, type=float)

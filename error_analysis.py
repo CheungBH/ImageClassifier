@@ -14,10 +14,7 @@ try:
 except ImportError:
     mix_precision = False
 import os
-import config.config as config
 from utils.utils import load_config
-
-metric_names = config.error_analysis_metrics
 
 
 def error_analyse(args):
@@ -41,7 +38,7 @@ def error_analyse(args):
     data_loader.build(data_path, settings, label_path,1, num_worker, shuffle=False,
                       data_percentage=args.data_percentage)
     args.labels = data_loader.label
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.BCELoss()
 
     MB = ModelBuilder()
     model = MB.build(data_loader.cls_num, backbone, device)
@@ -50,7 +47,7 @@ def error_analyse(args):
     model.eval()
 
     loader_desc = tqdm(data_loader.dataloaders_dict[phase])
-    EAR = ErrorAnalyserRecorder(model_path, metric_names, args.auto, logger_path=args.logger_path)
+    EAR = ErrorAnalyserRecorder(model_path, data_loader.label, args.auto, logger_path=args.logger_path)
 
     for i, (names, inputs, labels) in enumerate(loader_desc):
         inputs = inputs.to(device)
@@ -64,12 +61,11 @@ def error_analyse(args):
                 loss = loss1 + 0.4 * loss2
             else:
                 outputs = model(inputs)
-                outputs = MB.softmax(outputs)
-                loss = criterion(outputs, labels)
+                outputs = MB.sigmoid(outputs)
+                loss = criterion(outputs, labels.float())
 
         loader_desc.set_description("Error analysing")
-        EAR.update(names[0].split("/")[-1], (loss.tolist(), outputs.max().tolist(), outputs[0][labels].tolist()[0],
-                                             int(torch.max(outputs, 1)[1] == labels)))
+        EAR.update(names[0].split("/")[-1], loss.tolist(), labels, outputs)
     EAR.release()
     print("Error analysis has been saved in {}".format(args.logger_path))
 
@@ -98,6 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('--phase', default="val")
     parser.add_argument('--logger_path', default="")
     parser.add_argument('--data_percentage', '-dp', type=float, default=1)
+    parser.add_argument('--conf', default=0.5, type=float)
 
     parser.add_argument('--num_worker', default=0, type=int)
     parser.add_argument('--auto', action="store_true")
