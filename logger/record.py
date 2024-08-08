@@ -84,9 +84,9 @@ class ErrorAnalyserRecorder:
         #     self.records[idx].append(metrics[idx])
         self.records[0].append(loss)
         for idx in range(len(labels)):
-            self.records[idx + 1].append(labels[idx])
+            self.records[idx + 1].append(labels[idx].tolist())
         for idx in range(len(outputs)):
-            self.records[idx + len(labels) + 1].append(outputs[idx])
+            self.records[idx + len(labels) + 1].append(outputs[idx].tolist())
 
     def release(self):
         for idx in range(len(self.metric_names)):
