@@ -5,13 +5,13 @@ from .utils import image_normalize, read_labels
 from .adjust_trainval import ImgAdjuster
 import os
 from PIL import Image
-from collections import Counter
+import json
 from torchvision import transforms
 import random
 
 
 class ClassifyDataset(Dataset):
-    def __init__(self, img_path, label_cls, settings, is_train=True, data_percentage=1, label_folder="labels"):
+    def __init__(self, img_path, settings, is_train=True, data_percentage=1, label_folder="labels"):
         img_dir_name, img_dir_label, self.img_name, self.img_label = [], [], [], []
         self.data_percentage = data_percentage
         self.size = settings["model"]["input_size"]
@@ -25,22 +25,29 @@ class ClassifyDataset(Dataset):
             transforms.Normalize(mean=settings["transform"]["mean"], std=settings["transform"]["std"])
         ])
 
-        img_folder = os.path.join(img_path, "images")
-        label_folder = os.path.join(img_path, label_folder)
+        img_folder = img_path#os.path.join(img_path, "images")
+        label_file = img_folder + ".json"
+        if os.path.exists(label_file):
+            with open(label_file, "r") as f:
+                labels = json.load(f)
+        else:
+            raise ValueError("The label file does not exist!")
+
         img_file_names = os.listdir(img_folder)
         for idx, img_name in enumerate(img_file_names):
             if (idx * self.data_percentage) % 1 != 0:
                 continue
-            if not img_name.endswith(".jpg"):
+            if img_name.endswith(".DS_Store"):
                 continue
 
-            label = [0 for _ in range(len(label_cls))]
+            label = labels[img_name.split(".")[0]]
             self.img_name.append(os.path.join(img_folder, img_name))
-            with open(os.path.join(label_folder, os.path.splitext(img_name)[0] + ".txt"), "r") as f:
-                img_labels = [line.replace("\n", "") for line in f.readlines()]#.strip()
-            for l in img_labels:
-                label[label_cls.index(l)] = 1
-            self.img_label.append(label)
+            self.img_label.append(label/10)
+            # with open(os.path.join(label_folder, os.path.splitext(img_name)[0] + ".txt"), "r") as f:
+            #     img_labels = [line.replace("\n", "") for line in f.readlines()]#.strip()
+            # for l in img_labels:
+            #     label[label_cls.index(l)] = 1
+            # self.img_label.append(label)
 
     def __len__(self):
         return len(self.img_name)
@@ -96,7 +103,7 @@ class DataLoader:
 
     def build(self, data_dir, settings, label_path="", batch_size=32, num_worker=2, shuffle=True, **kwargs):
         self.label, self.label_path = self.get_labels(data_dir, label_path)
-        self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), self.label, is_train=x == "train", settings=settings, **kwargs) for x in self.phases}
+        self.image_datasets = {x: ClassifyDataset(os.path.join(data_dir, x), is_train=x == "train", settings=settings, **kwargs) for x in self.phases}
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
                                                                 shuffle=shuffle, num_workers=num_worker)
                             for x in self.phases}

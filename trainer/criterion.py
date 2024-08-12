@@ -13,6 +13,8 @@ class CriteriaInitializer:
             return nn.MultiLabelSoftMarginLoss()
         elif crit == "BCE":
             return nn.BCEWithLogitsLoss()
+        elif crit == "MSE":
+            return nn.MSELoss()
         else:
             raise NotImplementedError("Current criteria '{}' is not supported yet".format(crit))
 

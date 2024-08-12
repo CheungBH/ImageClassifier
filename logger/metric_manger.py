@@ -38,11 +38,11 @@ class MetricManager:
                     in enumerate(zip(metrics, self.metrics)):
                 self.metrics_record[phase][idx].append(metric)
 
-        for metric_idx in range(len(self.cls_metrics)):
-            for cls_idx in range(self.cls_num):
-                self.cls_metrics_record[phase][metric_idx][cls_idx].append(
-                    cls_metrics[metric_idx][cls_idx]
-                )
+        # for metric_idx in range(len(self.cls_metrics)):
+        #     for cls_idx in range(self.cls_num):
+        #         self.cls_metrics_record[phase][metric_idx][cls_idx].append(
+        #             cls_metrics[metric_idx][cls_idx]
+        #         )
         return self.updated_metrics
 
     def get_best_metrics(self):

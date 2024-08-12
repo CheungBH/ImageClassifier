@@ -41,7 +41,7 @@ def train(args):
 
     data_loader = DataLoader()
     data_loader.build_with_args(args, settings)
-    args.cls_num = data_loader.cls_num
+    args.cls_num = 1
     args.labels = data_loader.label
 
     MB = ModelBuilder()
@@ -87,6 +87,7 @@ def train(args):
                         loss = loss1 + 0.4 * loss2
                     else:
                         outputs = model(inputs)
+                        outputs = outputs.squeeze()
                         # outputs = MB.sigmoid(outputs)
                         loss = criterion(outputs, labels.float())
 
@@ -107,17 +108,18 @@ def train(args):
                     schedule.update(phase, "iter")
 
                 EpochEval.update(outputs, labels, loss)
-                batch_loss, batch_acc = BatchEval.update(loss, outputs, labels)
+                batch_loss, batch_dist = BatchEval.update(loss, outputs, labels)
                 loader_desc.set_description(
-                    '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=epoch, loss=loss, acc=batch_acc)# , AUC=batch_auc, PR=batch_pr)
+                    '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=epoch, loss=loss,
+                                                                                  acc=batch_dist)# , AUC=batch_auc, PR=batch_pr)
                 )
 
-            loss, acc, cls_metric = EpochEval.calculate()
-            print("{}: {}".format(phase, acc))
+            loss, dist = EpochEval.calculate()
+            print("{}: {}".format(phase, dist))
             loader_desc.set_description(
-                '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=epoch, loss=loss,
-                                                                              acc=acc)            )
-            TR.update(model, (loss, acc), epoch, phase, [cls_metric])
+                '{phase}: {epoch} | loss: {loss:.8f} | dist: {dist:.4f}'.format(phase=phase, epoch=epoch, loss=loss,
+                                                                              dist=dist))
+            TR.update(model, (loss, dist), epoch, phase)
         schedule.update(phase, "epoch")
         args.iterations = iterations
         args.start_epoch = epoch

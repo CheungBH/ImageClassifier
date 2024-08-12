@@ -33,7 +33,7 @@ class ModelBuilder:
     def build_with_args(self, args):
         self.device = args.device
         self.backbone = args.backbone
-        self.cls_num = args.cls_num
+        self.cls_num = 1
         self.device = args.device
         model = self.build(self.cls_num, self.backbone, self.device)
         if args.load_weight:

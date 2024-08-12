@@ -24,10 +24,11 @@ class EpochEvaluator:
 
     def calculate(self):
         loss = self.loss / len(self.labels)
-        acc = accuracy_score(self.labels.cpu(), (self.outputs > self.conf).cpu())
+        dist = torch.mean(torch.abs(self.outputs - self.labels)).cpu()
+        # acc = accuracy_score(self.labels.cpu(), (self.outputs > self.conf).cpu())
         # acc, auc, pr = self.MC.calculate_all(self.outputs, self.labels)
-        cls_acc = self.calculate_cls()
-        return loss.tolist(), acc, cls_acc
+        # cls_acc = self.calculate_cls()
+        return loss.tolist(), dist.tolist()
 
     # def calculate_cls(self):
     #     cls_acc, cls_auc, cls_pr = [], [], []
@@ -79,7 +80,8 @@ class BatchEvaluator:
             self.outputs = torch.cat((self.outputs, outputs), dim=0)
             self.labels = torch.cat((self.labels, labels), dim=0)
         loss = self.loss_logger.average()
-        acc = accuracy_score(labels.cpu(), (outputs>0.5).cpu())
+        dist = torch.mean(torch.abs(outputs - labels)).cpu()
+        # acc = accuracy_score(labels.cpu(), (outputs>0.5).cpu())
         # acc = self.metric_logger.cal_acc(self.outputs, self.labels)
         # _, auc, pr = self.metric_logger.calculate_all(self.outputs, self.labels)
-        return loss, acc
+        return loss, dist
