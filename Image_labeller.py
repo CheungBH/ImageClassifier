@@ -87,22 +87,23 @@ class ImageClassifierGUI:
         if current_image.split('.')[0] in self.classification_results:
             self.label_input.delete(0, tk.END)
             self.label_input.insert(0, self.classification_results[current_image.split('.')[0]])
-            self.current_label_display.config(text=f"Current Label: {self.classification_results[current_image.split('.')[0]]:.2f}")
+            self.current_label_display.config(text=f"Current Label: {self.classification_results[current_image.split('.')[0]]}")
         else:
             self.label_input.delete(0, tk.END)
             self.current_label_display.config(text="Current Label: None")
 
     def label_image(self):
         try:
-            label_value = float(self.label_input.get())
-            if 0 <= label_value <= 1:
+            label_value = int(self.label_input.get())
+            if 0 <= label_value <= 10:
                 current_image = self.image_files[self.current_index]
                 self.classification_results[current_image.split('.')[0]] = label_value
-                self.current_label_display.config(text=f"Current Label: {label_value:.2f}")
+                self.current_label_display.config(text=f"Current Label: {label_value}")
+                self.next_image()
             else:
-                messagebox.showerror("Error", "Label must be between 0 and 1.")
+                messagebox.showerror("Error", "Label must be an integer between 0 and 10.")
         except ValueError:
-            messagebox.showerror("Error", "Invalid input. Please enter a number between 0 and 1.")
+            messagebox.showerror("Error", "Invalid input. Please enter an integer between 0 and 10.")
 
     def next_image(self):
         self.current_index += 1
