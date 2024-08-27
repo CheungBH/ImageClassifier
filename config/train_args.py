@@ -30,7 +30,7 @@ parser.add_argument('--schedule', default="step", type=str)
 parser.add_argument('--schedule_gamma', default="")
 
 '''criteria configuration'''
-parser.add_argument('--crit', default="BCE", type=str)
+parser.add_argument('--crit', default="MSE", type=str)
 
 '''other configuration'''
 parser.add_argument('--save_dir', "-s", default="weights", type=str)
