@@ -110,7 +110,7 @@ def train(args):
                 EpochEval.update(outputs, labels, loss)
                 batch_loss, batch_dist = BatchEval.update(loss, outputs, labels)
                 loader_desc.set_description(
-                    '{phase}: {epoch} | loss: {loss:.8f} | acc: {acc:.4f}'.format(phase=phase, epoch=epoch, loss=loss,
+                    '{phase}: {epoch} | loss: {loss:.8f} | dist: {acc:.4f}'.format(phase=phase, epoch=epoch, loss=loss,
                                                                                   acc=batch_dist)# , AUC=batch_auc, PR=batch_pr)
                 )
 

@@ -3,8 +3,8 @@ from __future__ import print_function
 computer = "laptop"
 
 # Training
-metric_names = ["loss", "acc"]
-metric_directions = ["down", "up"]
+metric_names = ["loss", "dist"]
+metric_directions = ["down", "down"]
 cls_metric_names = ["acc"]
 
 warm_up = {0: 0.1, 1: 0.5}
