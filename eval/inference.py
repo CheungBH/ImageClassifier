@@ -8,7 +8,7 @@ import torch
 
 
 class ModelInference:
-    def __init__(self, model_path, backbone, visualize, inp_size, device="cuda:0", conf=0.5):
+    def __init__(self, model_path, backbone, inp_size, device="cuda:0", conf=0.5):
         self.backbone = backbone if backbone else get_pretrain(model_path)
         self.model_size = inp_size
         self.classes = 1# read_labels(label_path)
@@ -16,7 +16,6 @@ class ModelInference:
         self.model = self.MB.build(1, self.backbone, device)
         self.MB.load_weight(model_path)
         self.model.eval()
-        self.visualize = visualize
         self.device = device
         self.conf = conf
         self.colors = [random.randint(0, 255)]
