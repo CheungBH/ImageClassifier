@@ -88,7 +88,7 @@ def train(args):
                     else:
                         outputs = model(inputs)
                         outputs = outputs.squeeze()
-                        # outputs = MB.sigmoid(outputs)
+                        outputs = MB.sigmoid(outputs)
                         loss = criterion(outputs, labels.float())
 
                 if phase == 'train':

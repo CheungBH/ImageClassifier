@@ -21,8 +21,8 @@ class Demo:
         backbone = settings["model"]["backbone"]
         inp_size = settings["model"]["input_size"]
 
-        self.MI = ModelInference(model_path=args.model_path, label_path=args.label_path, backbone=backbone,
-                 visualize=args.visualize, device=args.device, inp_size=inp_size, conf=args.conf)
+        self.MI = ModelInference(model_path=args.model_path, backbone=backbone, visualize=args.visualize,
+                                 device=args.device, inp_size=inp_size, conf=args.conf)
         self.input = args.input_src
         self.output = args.output_src
         self.show = True if args.show_ratio else False
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_src', help="Target input", required=True)
     parser.add_argument('--model_path', required=True)
-    parser.add_argument('--label_path', required=True)
+    # parser.add_argument('--label_path', )
     parser.add_argument('--cfg_path', default=None)
     parser.add_argument('--device', default="cuda:0")
     parser.add_argument('--output_src', help="")

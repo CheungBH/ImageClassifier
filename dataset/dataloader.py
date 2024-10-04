@@ -107,7 +107,7 @@ class DataLoader:
         self.dataloaders_dict = {x: torch.utils.data.DataLoader(self.image_datasets[x], batch_size=batch_size,
                                                                 shuffle=shuffle, num_workers=num_worker)
                             for x in self.phases}
-        self.cls_num = len(self.label)
+        self.cls_num = 1
 
     def get_labels(self, img_dir, label_path):
         if label_path:

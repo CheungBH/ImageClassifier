@@ -1,5 +1,5 @@
 #-*-coding:utf-8-*-
-
+#regression branch: torchsize
 import os
 from models.build import ModelBuilder
 from dataset.dataloader import DataLoader
@@ -40,7 +40,7 @@ def test(args):
     data_loader = DataLoader(phases=(phase,))
     data_loader.build(data_path, settings, "", batch_size, num_worker)
     args.labels = data_loader.label
-
+    args.cls_num = 1
     MB = ModelBuilder()
     model = MB.build(data_loader.cls_num, backbone, args.device)
     MB.load_weight(model_path)
@@ -66,6 +66,7 @@ def test(args):
             else:
                 outputs = model(inputs)
                 outputs = MB.sigmoid(outputs)
+                outputs = outputs.squeeze()
                 loss = criterion(outputs, labels.float())
 
             EpochEval.update(outputs, labels, loss)
@@ -105,7 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--cfg_path', default=None)
     parser.add_argument('--phase', default="val")
     parser.add_argument('--batch_size', default=64, type=int)
-    parser.add_argument('--num_worker', default=4, type=int)
+    parser.add_argument('--num_worker', default=0, type=int)
     parser.add_argument('--conf', default=0.5, type=float)
     parser.add_argument('--auto', action="store_true")
     parser.add_argument('--device', default="cuda:0")
