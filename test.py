@@ -25,7 +25,7 @@ def test(args):
     model_path = args.model_path
     data_path = args.data_path
     if args.cfg_path is None:
-        args.cfg_path = "/".join(args.model_path.split("/")[:-1]) + "/config.yaml"
+        args.cfg_path = os.path.join(os.path.dirname(args.model_path), "config.yaml")
         assert os.path.exists(args.cfg_path), "The config file does not exist!"
     settings = load_config(args.cfg_path)
 
