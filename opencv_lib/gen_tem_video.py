@@ -268,7 +268,7 @@ def main():
                 if video_idx % 20 == 0:
                     print("Finish processing video {}".format(video_idx))
                 video_name = os.path.basename(input_video_path)[:-4]
-                cv_name = cfg.split(".")[0]
+                cv_name = cfg.split("/")[-1].split(".")[0]
                 for delay in frame_delay:
                     output_video_path = os.path.join(folder_path, f"{video_name}_{cv_name}_delay{delay}.mp4")
                     handler = OpencvHandler(os.path.join(opt.cfg_folder, cfg), delay)

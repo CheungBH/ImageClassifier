@@ -1,8 +1,9 @@
 {
+  "type": "optical_flow",
   "maxCorners": 100,
   "qualityLevel": 0.1,
   "minDistance": 7,
   "blockSize" : 7,
   "winSize": "15, 15",
-  "maxLevel": 2,
+  "maxLevel": 2
 }
