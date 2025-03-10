@@ -8,6 +8,7 @@ from PIL import Image
 from collections import Counter
 from torchvision import transforms
 import random
+from utils.utils import remove_all_DS_Store
 
 
 class ClassifyDataset(Dataset):
@@ -47,6 +48,7 @@ class ClassifyDataset(Dataset):
 
     def init_augment(self, settings):
         # https://www.cnblogs.com/jgg54335/p/14572640.html
+        self.color = settings["transform"]["color"]
         self.flip_ratio = settings["transform"]["flip"]["p"]
         self.rotate_max = settings["transform"]["rotate"]["max_factor"]
         self.rotate_ratio = settings["transform"]["rotate"]["p"]
@@ -59,6 +61,8 @@ class ClassifyDataset(Dataset):
         image_name = self.img_name[item]
         label = self.img_label[item]
         image = Image.open(image_name).convert("RGB")
+        if self.color == "gray":
+            image = image.convert("L").convert("RGB")
         if self.is_train:
             image = self.augment(image)
         image = self.transforms(image)
@@ -89,9 +93,10 @@ class DataLoader:
         batch_size = args.batch_size
         num_worker = args.num_worker
 
-        if adjust_ratio > 0 and self.phases is ("train", "val"):
+        if adjust_ratio > 0 and self.phases in ("train", "val"):
             ImgAdjuster(adjust_ratio, data_dir).run()
         assert self.phases, "Please assign your phases using the dataset!"
+        remove_all_DS_Store(data_dir)
         self.build(data_dir, settings, label_path, batch_size, num_worker, data_percentage=data_percentage)
 
     def build(self, data_dir, settings, label_path="", batch_size=32, num_worker=2, shuffle=True, **kwargs):
@@ -104,7 +109,7 @@ class DataLoader:
 
     def get_labels(self, img_dir, label_path):
         if label_path:
-            return read_labels(label_path)
+            return read_labels(label_path), label_path
         label_path = os.path.join(img_dir, "labels.txt")
         if os.path.exists(label_path):
             return read_labels(label_path), label_path

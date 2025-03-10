@@ -3,6 +3,13 @@ import os
 import yaml
 
 
+def remove_all_DS_Store(path):
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.startswith('.'):
+                os.remove(os.path.join(root, file))
+
+
 def load_config(config_file):
     with open(config_file, 'r') as config_file:
         config = yaml.load(config_file, Loader=yaml.FullLoader)
